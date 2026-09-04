@@ -3,5 +3,5 @@
 // 2) GitHub Pages에서 별도 Cloudflare Worker를 쓰면 Worker 주소를 입력
 //    예: https://oy-da22-stock-proxy.<내계정>.workers.dev
 window.OY_CONFIG = {
-  STOCK_PROXY_URL: ''
+  STOCK_PROXY_URL: 'https://oliveyoung-selling.bjisu8098.workers.dev/api/stock'
 };
