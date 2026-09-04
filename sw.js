@@ -1,6 +1,6 @@
-const CACHE='oy-da22-v7-fixed';
+const CACHE='oy-da22-v8';
 const ASSETS=[
-  './','./index.html','./manifest.webmanifest','./db.json','./fonts/Mallang-Galmuri11-R.ttf',
+  './','./index.html','./manifest.webmanifest','./config.js','./db.json','./fonts/Mallang-Galmuri11-R.ttf',
   './icons/icon-512.png','./icons/icon-192.png','./icons/icon-180.png','./icons/icon-96.png','./icons/icon-48.png','./icons/icon-32.png','./icons/icon-16.png',
   './icons/products_off.png','./icons/products_on.png','./icons/skin_off.png','./icons/skin_on.png','./icons/makeup_off.png','./icons/makeup_on.png',
   './icons/search_off.png','./icons/search_on.png','./icons/sticker_heart.png','./icons/sticker_sleep.png','./icons/sticker_wave.png'

@@ -36,6 +36,7 @@
 <button id="tab-makeup" class="tab" onclick="show('makeup')"><span class="tab-icon"><img data-off="./icons/makeup_off.png" data-on="./icons/makeup_on.png" src="./icons/makeup_off.png" alt=""></span>메이크업</button>
 </nav>
 </main>
+<script src="./config.js"></script>
 <script>
 let DB={products:[],ingredients:[],concerns:[],product_ingredients:[],concern_ingredients:[],product_similarities:[]};
 const $=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -55,7 +56,42 @@ function selectSubTarget(id){const p=DB.products.find(x=>x.goodsNumber===id);if(
 function renderSubstitutes(target){const verified=target.analysis_status==='verified';const simMap=new Map(DB.product_similarities.filter(x=>x.product_id===target.goodsNumber).map(x=>[x.similar_product_id,Number(x.score||0)]));const tt=tokens(target.goodsName+' '+target.brand+' '+target.standard_category+' '+target.sub_category);let cand=DB.products.filter(p=>p.goodsNumber!==target.goodsNumber&&Number(p.current_stock)>0).map(p=>{let score=0,reason=[];if(simMap.has(p.goodsNumber)){score=simMap.get(p.goodsNumber)*100;reason.push('기존 유사도 데이터')}else{const pt=tokens(p.goodsName+' '+p.brand+' '+p.standard_category+' '+p.sub_category);score+=jaccard(tt,pt)*55;if(p.standard_category&&p.standard_category===target.standard_category){score+=25;reason.push('동일 세부 카테고리')}if(p.sub_category&&p.sub_category===target.sub_category){score+=10;reason.push('동일 하위 카테고리')}if(p.brand&&p.brand===target.brand){score+=5;reason.push('동일 브랜드')}const price=Number(target.price||0),pp=Number(p.price||0);if(price&&pp){score+=Math.max(0,10-Math.min(10,Math.abs(price-pp)/Math.max(price,1)*10));reason.push('가격대 참고')}}return{p,score,reason}}).sort((a,b)=>b.score-a.score).slice(0,5);$('subCandidates').innerHTML=`<div class="section-title">현재 매장 구매 가능한 대체 후보</div><div class="notice">재고 스냅샷상 재고가 있는 상품을 우선 노출합니다. 성분 분석이 없는 상품은 메타데이터 기반 1차 후보입니다.</div><div class="grid" style="margin-top:9px">${cand.map((x,i)=>{const p=x.p;return`<div class="rank-card"><div class="rank-num">${i+1}</div><div class="rank-body"><span class="score">유사도 ${Math.min(99,Math.round(x.score))}</span><h3>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</h3><div class="tags">${stockTag(p)}</div><div class="reason"><b>추천 이유</b><br>${esc(x.reason.join(' · ')||'상품 메타데이터 유사도')}</div><div class="talk"><b>💬 직원용 한마디</b><br>“찾으시는 제품은 없지만, 이 제품도 비슷한 목적에 사용할 수 있고 지금 매장에 재고가 있어요.”</div><button class="btn light small" style="margin-top:8px" onclick="openProduct('${esc(p.goodsNumber)}')">상품 정보 보기</button></div></div>`}).join('')||'<div class="empty">재고가 있는 대체 후보를 찾지 못했습니다.</div>'}</div>`}
 function tokens(s){return new Set(String(s||'').toLowerCase().normalize('NFKC').replace(/[^0-9a-z가-힣]+/g,' ').split(/\s+/).filter(x=>x.length>=2))}
 function jaccard(a,b){let n=0;for(const x of a)if(b.has(x))n++;const u=new Set([...a,...b]).size;return u?n/u:0}
-async function checkLiveStock(id,targetId){const p=DB.products.find(x=>x.goodsNumber===id);const out=$(targetId||`live-${id}`),btn=$(`liveBtn-${id}`);if(!p||!out)return;out.className='live-status notice';out.textContent='실시간 재고 조회 중…';if(btn)btn.disabled=true;const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),2500);try{const body={size:20,dispCatNo:'',page:1,keyword:p.goodsNumber,sort:'01',strNo:'DA22',includeSoldOut:true};const res=await fetch('https://m.oliveyoung.co.kr/oystore/api/stock/product-stock-v3',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal});if(!res.ok)throw new Error('HTTP '+res.status);const json=await res.json();const list=Array.isArray(json?.data?.serachList)?json.data.serachList:[];const match=list.find(x=>String(x.goodsNumber)===String(p.goodsNumber)||String(x.masterGoodsNumber)===String(p.goodsNumber)||String(x.itemNumbers||'').split(/[|,\s]+/).some(b=>String(b)===String(p.barcode_master)));if(!match)throw new Error('상품을 API 검색 결과에서 확인하지 못했습니다.');const q=Number(match.o2oRemainQuantity);const checked=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});out.className=q>0?'live-status success':'live-status danger';out.textContent=Number.isFinite(q)?(q>0?`🟢 현재 재고 ${q}개 · ${checked} 확인`:`🔴 현재 재고 0개 · ${checked} 확인`):`재고 수량을 확인하지 못했습니다 · ${checked}`;p.current_stock=Number.isFinite(q)?q:p.current_stock;p.o2oStockFlag=match.o2oStockFlag;p.stock_checked_at=new Date().toISOString()}catch(e){out.className='live-status notice';out.innerHTML=`실시간 조회에 실패했습니다. 현재 저장된 재고는 <b>${esc(Number.isFinite(Number(p.current_stock))?Number(p.current_stock)+'개':'미확인')}</b>입니다.<br><span class="note">${e.name==='AbortError'?'2.5초 안에 응답하지 않았습니다.':'브라우저의 외부 API 접근(CORS) 또는 서버 제한일 수 있습니다.'}</span>`}finally{clearTimeout(timer);if(btn)btn.disabled=false}}
+async function checkLiveStock(id,targetId){
+  const p=DB.products.find(x=>x.goodsNumber===id);
+  const out=$(targetId||`live-${id}`),btn=$(`liveBtn-${id}`);
+  if(!p||!out)return;
+  out.className='live-status notice';
+  out.textContent='실시간 재고 조회 중…';
+  if(btn)btn.disabled=true;
+  const base=String(window.OY_CONFIG?.STOCK_PROXY_URL||'').replace(/\/$/,'');
+  const endpoint=(base?base:'/api/stock');
+  const params=new URLSearchParams({goodsNumber:String(p.goodsNumber),goodsName:String(p.goodsName||''),barcode:String(p.barcode_master||''),storeCode:'DA22'});
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),7000);
+  try{
+    const res=await fetch(`${endpoint}?${params.toString()}`,{method:'GET',headers:{'Accept':'application/json'},cache:'no-store',signal:controller.signal});
+    const json=await res.json().catch(()=>({}));
+    if(!res.ok||json.ok===false)throw new Error(json.message||`HTTP ${res.status}`);
+    const q=Number(json.quantity);
+    const checked=json.checkedAt?new Date(json.checkedAt):new Date();
+    const checkedText=checked.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    out.className=q>0?'live-status success':'live-status danger';
+    out.textContent=Number.isFinite(q)
+      ?(q>0?`🟢 현재 재고 ${q}개 · ${checkedText} 확인`:`🔴 현재 재고 0개 · ${checkedText} 확인`)
+      :`재고 수량을 확인하지 못했습니다 · ${checkedText}`;
+    if(Number.isFinite(q))p.current_stock=q;
+    if(json.stockStatus)p.stockStatus=json.stockStatus;
+    p.stock_checked_at=checked.toISOString();
+  }catch(e){
+    out.className='live-status notice';
+    const fallback=Number.isFinite(Number(p.current_stock))?`${Number(p.current_stock)}개`:'미확인';
+    const reason=e.name==='AbortError'?'7초 안에 응답하지 않았습니다.':'프록시/올리브영 서버 응답을 확인하지 못했습니다.';
+    out.innerHTML=`실시간 조회에 실패했습니다. 저장된 재고는 <b>${esc(fallback)}</b>입니다.<br><span class="note">${esc(reason)}</span>`;
+  }finally{
+    clearTimeout(timer);
+    if(btn)btn.disabled=false;
+  }
+}
 function renderChips(id,items){$(id).innerHTML=items.map(x=>`<button class="chip" data-v="${esc(x)}" onclick="this.classList.toggle('on')">${esc(x)}</button>`).join('')}
 function renderCats(id,items){$(id).innerHTML=items.map(x=>`<button class="category" data-v="${esc(x)}" onclick="this.classList.toggle('on')">${esc(x)}</button>`).join('')}
 function selected(id){return[...document.querySelectorAll('#'+id+' .on')].map(x=>x.dataset.v)}
