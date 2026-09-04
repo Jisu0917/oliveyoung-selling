@@ -20,3 +20,10 @@
 - 검색 버튼: 돋보기 토끼 아이콘 적용
 - 홈 카드와 데이터 영역: 토끼 스티커 적용
 - 원본 DB/검색/실시간 재고 조회 로직은 v6 기준을 유지했습니다.
+
+
+## GitHub 폴더 구조
+- 폰트: `fonts/Mallang-Galmuri11-R.ttf`
+- 모든 토끼/앱 아이콘: `icons/`
+- index.html, manifest.webmanifest, sw.js의 경로를 위 구조에 맞춰 수정했습니다.
+- Service Worker 캐시 이름도 변경하여 이전 v7 캐시가 새 경로를 가로막지 않도록 했습니다.
