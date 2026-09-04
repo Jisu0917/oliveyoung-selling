@@ -202,8 +202,10 @@ async function startScan(){
  $('scanStatus').textContent='바코드 모듈을 준비하는 중…';
  try{
    const ZX=await loadZXing();
-   const reader=new ZX.BrowserMultiFormatReader();
-   scanControls=await reader.decodeFromConstraints({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}},$('video'),(result,error)=>{
+   const Reader=ZX.BrowserMultiFormatReader||ZX.BrowserMultiFormatOneDReader;
+   if(!Reader)throw new Error('ZXing Reader 생성 실패');
+   const reader=new Reader();
+   scanControls=await reader.decodeFromConstraints({video:{facingMode:{ideal:'environment'},width:{ideal:640},height:{ideal:480},frameRate:{ideal:30,max:30}}},$('video'),(result,error)=>{
      if(result){
        const code=result.getText();$('scanStatus').textContent=`인식: ${code}`;stopScan();
        const p=DB.products.find(x=>String(x.barcode_master)===String(code)||String(x.barcodes_all||'').split(' ').includes(String(code)));
@@ -227,5 +229,7 @@ async function scanPhoto(file){
 }
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
 loadDB().catch(e=>$('dbSummary').textContent='DB 로드 실패: '+e.message);
+// 다음에 스캔 버튼을 누를 때까지 기다리지 않고, 앱이 열린 뒤 백그라운드에서 ZXing을 미리 준비합니다.
+window.addEventListener('load',()=>{setTimeout(()=>loadZXing().catch(()=>{}),250);});
 </script>
 </body></html>
