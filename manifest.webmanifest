@@ -1,10 +1,13 @@
 {
-  "name":"올영 직원 도우미 · 장승배기역점",
-  "short_name":"올영 직원도우미",
-  "start_url":"./index.html",
+  "name":"올영 판매 도우미 · DA22",
+  "short_name":"올영 판매 도우미",
+  "start_url":"./",
   "display":"standalone",
-  "background_color":"#f6f6f6",
-  "theme_color":"#111111",
+  "background_color":"#fff7fa",
+  "theme_color":"#ffd2dc",
   "lang":"ko",
-  "icons":[]
+  "icons":[
+    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
 }
