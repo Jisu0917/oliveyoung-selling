@@ -14,12 +14,11 @@ button,input,select{font:inherit}.app{max-width:560px;margin:auto;min-height:100
 .screen{padding:16px 18px}.hidden{display:none!important}.section-title{font-size:15px;font-weight:900;margin:18px 0 9px}.home-grid{display:grid;gap:10px;margin-top:8px}.home-btn{border:0;border-radius:18px;padding:21px 18px;text-align:left;background:#111;color:#fff}.home-btn.alt{background:#fff;color:#111;border:1px solid var(--line)}.home-btn b{display:block;font-size:18px;margin-bottom:5px}.home-btn span{font-size:12px;opacity:.72}.search{display:flex;gap:7px}.search input{min-width:0;flex:1;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.btn{border:0;border-radius:11px;padding:10px 13px;background:#111;color:#fff;font-weight:800}.btn.light{background:#eee;color:#222}.btn.full{width:100%}.back{border:0;background:none;color:#777;padding:0 0 8px}.camera{overflow:hidden;border-radius:17px;background:#111}.camera video{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}.camera-actions{display:flex;gap:7px;padding:8px}.camera-actions>*{flex:1}.status{font-size:11px;color:#777;margin:8px 0}.list{display:grid;gap:8px}.item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.item button{width:100%;border:0;background:none;text-align:left;padding:0}.item b{font-size:13px;line-height:1.4}.item small{display:block;color:#777;margin-top:4px}.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px}.brand{font-size:12px;color:#777;font-weight:800}.name{font-size:19px;font-weight:900;line-height:1.35;margin:4px 0 10px}.tags{display:flex;gap:6px;flex-wrap:wrap}.tag{font-size:10px;background:var(--soft);border-radius:999px;padding:6px 8px}.tag.ok{background:var(--green);color:#176b35}.tag.warn{background:var(--yellow);color:#805800}.point{padding:11px 12px;border-radius:12px;margin-top:7px;font-size:13px;line-height:1.45}.point.key{background:var(--yellow)}.point.fit{background:var(--green)}.point.info{background:var(--blue)}.point.caution{background:var(--red);color:#7c2727}.point strong{display:block;font-size:10px;color:#666;margin-bottom:3px}.tiny{font-size:10px;color:#888;line-height:1.4}.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 11px;font-size:11px}.chip.on{background:#111;color:#fff;border-color:#111}.compare-toolbar{display:flex;gap:7px;align-items:center}.compare-count{font-size:11px;color:#777;margin-left:auto}.table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:14px}.compare-table{border-collapse:collapse;width:100%;min-width:640px;font-size:11px}.compare-table th,.compare-table td{border-bottom:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}.compare-table th{background:#fafafa;position:sticky;top:0}.conclusion{margin-top:10px;padding:12px;border-radius:13px;background:#111;color:#fff;font-size:12px;line-height:1.5}.profile-grid{display:grid;gap:8px}.profile-row{background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px}.profile-row label{font-size:10px;color:#777;display:block;margin-bottom:5px;font-weight:800}.profile-row select{width:100%;border:0;background:#f5f5f5;border-radius:9px;padding:9px}.category-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.category{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px;font-size:11px;text-align:left}.category.on{background:#111;color:#fff;border-color:#111}.result-grid{display:grid;gap:8px}.result{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.result h3{margin:0;font-size:13px;line-height:1.4}.result p{font-size:11px;line-height:1.45;margin:5px 0}.foot{padding:16px 18px;color:#999;font-size:10px;line-height:1.5}
  
 .compare-phone{display:grid;gap:9px}
-.compare-product-card{background:#fff;border:1px solid var(--line);border-radius:15px;overflow:hidden}
-.compare-product-head{padding:12px 13px;border-bottom:1px solid var(--line)}
-.compare-product-head b{display:block;font-size:13px;line-height:1.4}
-.compare-product-head small{display:block;color:#777;font-size:10px;margin-top:3px}
-.compare-row{display:grid;grid-template-columns:82px 1fr;gap:10px;padding:10px 13px;border-bottom:1px solid var(--line);font-size:11px;line-height:1.45}
-.compare-label{font-weight:800;color:#777}
+.compare-section{background:#fff;border:1px solid var(--line);border-radius:15px;overflow:hidden}
+.compare-section-head{padding:11px 13px;background:#fafafa;border-bottom:1px solid var(--line);font-size:13px;font-weight:900}
+.compare-item{display:grid;grid-template-columns:105px 1fr;gap:10px;padding:10px 13px;border-bottom:1px solid var(--line);font-size:11px;line-height:1.45}
+.compare-item:last-child{border-bottom:0}
+.compare-product-name{font-weight:800;min-width:0}
 .compare-value{min-width:0;word-break:keep-all}
 </style>
 </head>
@@ -133,7 +132,6 @@ function renderCompare(){
  const ps=compareIds.map(id=>DB.products.find(p=>p.goodsNumber===id)).filter(Boolean);
  if(!ps.length){$('compareTable').innerHTML='<div class="item tiny">상품을 검색해 추가하세요.</div>';return}
  const rows=[
-  ['카테고리',p=>p.sub_category||p.standard_category||'-'],
   ['핵심 성분',p=>p.key_ingredients||'분석 대기'],
   ['추천 고객',p=>p.customer_concerns||'분석 대기'],
   ['제형',p=>p.texture||'분석 대기'],
@@ -141,16 +139,24 @@ function renderCompare(){
   ['분석 상태',p=>p.verification_status==='verified'?'✓ 완료':'△ 분석 대기']
  ];
  let h='<div class="compare-phone">';
- ps.forEach(p=>{
-  h+=`<article class="compare-product-card"><div class="compare-product-head"><b>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</b><small>${esc(p.goodsNumber)} · 재고 ${esc(p.current_stock??'-')}</small></div>`;
-  for(const [label,fn] of rows) h+=`<div class="compare-row"><div class="compare-label">${esc(label)}</div><div class="compare-value">${esc(fn(p))}</div></div>`;
-  h+=`<div style="padding:9px 13px"><button class="btn light" onclick="removeCompare('${esc(p.goodsNumber)}')">비교에서 제거</button></div></article>`;
+ rows.forEach(([label,fn])=>{
+   h+=`<section class="compare-section"><div class="compare-section-head">${esc(label)}</div>`;
+   ps.forEach(p=>{
+     const shortName=cleanName(p.goodsName);
+     h+=`<div class="compare-item"><div class="compare-product-name">${esc(p.brand)}<br><span class="tiny">${esc(shortName)}</span></div><div class="compare-value">${esc(fn(p))}</div></div>`;
+   });
+   h+='</section>';
  });
- h+='</div>';
+ h+='<section class="compare-section"><div class="compare-section-head">선택 상품</div>';
+ ps.forEach(p=>{
+   h+=`<div class="compare-item"><div class="compare-product-name">${esc(p.brand)}<br><span class="tiny">${esc(cleanName(p.goodsName))}</span></div><div class="compare-value"><button class="btn light" onclick="removeCompare('${esc(p.goodsNumber)}')">비교에서 제거</button></div></div>`;
+ });
+ h+='</section></div>';
  const verified=ps.filter(p=>p.verification_status==='verified');
  const conclusion=verified.length?`${verified.map(p=>`${p.brand}는 ${p.customer_concerns||'추천 고객 정보'}에 유리`).join(' / ')}.`:'현재 선택 상품 중 분석 완료 데이터가 없어 성분 기반 결론을 만들지 않습니다.';
  $('compareTable').innerHTML=h+`<div class="conclusion">한 줄 결론: ${esc(conclusion)}</div>`;
 }
+
 function renderFilters(){
  const cats=['클렌징','스킨케어','선케어','베이스 메이크업','립 메이크업','아이 메이크업','블러셔'];
  $('categoryGrid').innerHTML=cats.map(c=>`<button class="category" data-cat="${esc(c)}" onclick="this.classList.toggle('on')">${esc(c)}</button>`).join('');
@@ -177,13 +183,14 @@ function consult(){
 }
 let zxingPromise=null;
 function loadZXing(){
+ if(window.ZXingBrowser)return Promise.resolve(window.ZXingBrowser);
  if(window.ZXing)return Promise.resolve(window.ZXing);
  if(zxingPromise)return zxingPromise;
  zxingPromise=new Promise((resolve,reject)=>{
    const sc=document.createElement('script');
    sc.src='https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js';
    sc.async=true;
-   sc.onload=()=>window.ZXing?resolve(window.ZXing):reject(new Error('ZXing 전역 객체 생성 실패'));
+   sc.onload=()=>{const api=window.ZXingBrowser||window.ZXing;if(api)resolve(api);else reject(new Error('ZXing 전역 객체 생성 실패'));};
    sc.onerror=()=>reject(new Error('ZXing CDN 로드 실패'));
    document.head.appendChild(sc);
  });
