@@ -1,4 +1,4 @@
-const CACHE='oy-da22-v9';
+const CACHE='oy-da22-v11';
 const ASSETS=[
   './','./index.html','./manifest.webmanifest','./config.js','./db.json','./fonts/Mallang-Galmuri11-R.ttf',
   './icons/icon-512.png','./icons/icon-192.png','./icons/icon-180.png','./icons/icon-96.png','./icons/icon-48.png','./icons/icon-32.png','./icons/icon-16.png',
