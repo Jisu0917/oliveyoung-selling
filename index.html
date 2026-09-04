@@ -3,27 +3,175 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111">
+<meta name="theme-color" content="#FF7FA8">
 <link rel="manifest" href="manifest.webmanifest">
-<title>올영 직원 도우미 · DA22</title>
-
+<title>올영 셀링 헬퍼 · DA22</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f5f5f5;--card:#fff;--text:#171717;--muted:#777;--line:#e6e6e6;--accent:#111;--soft:#f0f0f0;--green:#eaf7ee;--yellow:#fff4d6;--blue:#eef5ff;--red:#fff1f1}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR",sans-serif}
-button,input,select{font:inherit}.app{max-width:560px;margin:auto;min-height:100vh;padding-bottom:30px}.top{padding:20px 18px 12px;background:#fff;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line)}.top h1{font-size:20px;margin:0 0 3px}.top p{font-size:12px;color:var(--muted);margin:0}
-.screen{padding:16px 18px}.hidden{display:none!important}.section-title{font-size:15px;font-weight:900;margin:18px 0 9px}.home-grid{display:grid;gap:10px;margin-top:8px}.home-btn{border:0;border-radius:18px;padding:21px 18px;text-align:left;background:#111;color:#fff}.home-btn.alt{background:#fff;color:#111;border:1px solid var(--line)}.home-btn b{display:block;font-size:18px;margin-bottom:5px}.home-btn span{font-size:12px;opacity:.72}.search{display:flex;gap:7px}.search input{min-width:0;flex:1;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.btn{border:0;border-radius:11px;padding:10px 13px;background:#111;color:#fff;font-weight:800}.btn.light{background:#eee;color:#222}.btn.full{width:100%}.back{border:0;background:none;color:#777;padding:0 0 8px}.camera{overflow:hidden;border-radius:17px;background:#111}.camera video{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}.camera-actions{display:flex;gap:7px;padding:8px}.camera-actions>*{flex:1}.status{font-size:11px;color:#777;margin:8px 0}.list{display:grid;gap:8px}.item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.item button{width:100%;border:0;background:none;text-align:left;padding:0}.item b{font-size:13px;line-height:1.4}.item small{display:block;color:#777;margin-top:4px}.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px}.brand{font-size:12px;color:#777;font-weight:800}.name{font-size:19px;font-weight:900;line-height:1.35;margin:4px 0 10px}.tags{display:flex;gap:6px;flex-wrap:wrap}.tag{font-size:10px;background:var(--soft);border-radius:999px;padding:6px 8px}.tag.ok{background:var(--green);color:#176b35}.tag.warn{background:var(--yellow);color:#805800}.point{padding:11px 12px;border-radius:12px;margin-top:7px;font-size:13px;line-height:1.45}.point.key{background:var(--yellow)}.point.fit{background:var(--green)}.point.info{background:var(--blue)}.point.caution{background:var(--red);color:#7c2727}.point strong{display:block;font-size:10px;color:#666;margin-bottom:3px}.tiny{font-size:10px;color:#888;line-height:1.4}.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 11px;font-size:11px}.chip.on{background:#111;color:#fff;border-color:#111}.compare-toolbar{display:flex;gap:7px;align-items:center}.compare-count{font-size:11px;color:#777;margin-left:auto}.table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:14px}.compare-table{border-collapse:collapse;width:100%;min-width:640px;font-size:11px}.compare-table th,.compare-table td{border-bottom:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}.compare-table th{background:#fafafa;position:sticky;top:0}.conclusion{margin-top:10px;padding:12px;border-radius:13px;background:#111;color:#fff;font-size:12px;line-height:1.5}.profile-grid{display:grid;gap:8px}.profile-row{background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px}.profile-row label{font-size:10px;color:#777;display:block;margin-bottom:5px;font-weight:800}.profile-row select{width:100%;border:0;background:#f5f5f5;border-radius:9px;padding:9px}.category-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.category{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px;font-size:11px;text-align:left}.category.on{background:#111;color:#fff;border-color:#111}.result-grid{display:grid;gap:8px}.result{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.result h3{margin:0;font-size:13px;line-height:1.4}.result p{font-size:11px;line-height:1.45;margin:5px 0}.foot{padding:16px 18px;color:#999;font-size:10px;line-height:1.5}
- 
-.compare-phone{display:grid;gap:9px}
-.compare-section{background:#fff;border:1px solid var(--line);border-radius:15px;overflow:hidden}
-.compare-section-head{padding:11px 13px;background:#fafafa;border-bottom:1px solid var(--line);font-size:13px;font-weight:900}
-.compare-item{display:grid;grid-template-columns:105px 1fr;gap:10px;padding:10px 13px;border-bottom:1px solid var(--line);font-size:11px;line-height:1.45}
+/* Mallang-Galmuri11 폰트를 저장소 루트에 함께 올려두면 자동으로 적용됩니다.
+   (예: /Mallang-Galmuri11-R.ttf 경로에 파일 추가) */
+@font-face{
+  font-family:'Mallang';
+  src:url('./Mallang-Galmuri11-R.ttf') format('truetype');
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
+:root{
+  --bg:#FFF3F7;
+  --card:#fff;
+  --text:#5B3A4B;
+  --muted:#9A7383;
+  --line:#FFD9E6;
+  --accent:#FF7FA8;
+  --accent2:#FF9DBE;
+  --soft:#FFE1EB;
+  --green:#B6ECD9;
+  --green-text:#2E7C61;
+  --yellow:#FFE28A;
+  --blue:#E4D9FB;
+  --red:#FFDCE1;
+  --red-text:#C64B5E;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:linear-gradient(180deg,#FFE6EF 0%,var(--bg) 40%);
+  color:var(--text);
+  font-family:'Mallang','Nanum Gothic',-apple-system,sans-serif;
+  -webkit-font-smoothing:none;
+}
+button,input,select{font:inherit}
+.app{max-width:480px;margin:auto;min-height:100vh;padding-bottom:86px}
+
+.brandmark{
+  text-align:center;
+  padding:18px 0 4px;
+  font-family:'Gaegu',sans-serif;
+  font-size:22px;
+  color:var(--accent);
+}
+
+.top{
+  padding:16px 20px 18px;
+  background:radial-gradient(ellipse at center,#fff 0%,var(--soft) 100%);
+  position:sticky;top:0;z-index:10;
+  border-bottom:2px solid var(--line);
+  border-radius:0 0 24px 24px;
+}
+.top h1{font-family:'Gaegu',sans-serif;font-size:26px;margin:0;color:var(--accent)}
+.top p{font-family:'Mallang','Nanum Gothic',sans-serif;font-size:11.5px;color:var(--muted);margin:4px 0 0}
+
+.screen{padding:16px 18px}
+.hidden{display:none!important}
+.section-title{font-family:'Gaegu',sans-serif;font-size:17px;color:var(--accent);margin:18px 0 10px;font-weight:400}
+
+.home-grid{display:grid;gap:12px;margin-top:8px}
+.home-btn{border:0;border-radius:22px;padding:18px 18px 16px;text-align:left;background:linear-gradient(to right,var(--accent),var(--accent2),var(--accent));color:#fff}
+.home-btn.alt{background:#fff;color:var(--text);border:2px solid var(--soft)}
+.home-btn b{display:block;font-family:'Gaegu',sans-serif;font-size:19px;margin-bottom:5px;font-weight:400}
+.home-btn span{font-size:12px;opacity:.85}
+.home-btn.alt span{color:var(--muted);opacity:1}
+
+.search{display:flex;gap:8px}
+.search input{min-width:0;flex:1;border:2px solid var(--line);border-radius:16px;padding:12px 14px;background:#fff;color:var(--text)}
+.search input::placeholder{color:var(--muted)}
+.btn{border:0;border-radius:14px;padding:11px 16px;background:var(--accent);color:#fff;font-weight:700;font-family:'Gaegu',sans-serif;font-size:14px}
+.btn.light{background:var(--soft);color:var(--accent)}
+.btn.full{width:100%;padding:14px;font-size:16px}
+.back{border:0;background:none;color:var(--muted);padding:0 0 10px;font-size:13px}
+
+.camera{overflow:hidden;border-radius:22px;background:var(--text);border:3px dashed var(--accent2)}
+.camera video{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.camera-actions{display:flex;gap:7px;padding:8px}
+.camera-actions>*{flex:1}
+.status{font-size:11.5px;color:var(--muted);margin:8px 0}
+
+.list{display:grid;gap:8px}
+.item{background:#fff;border:2px solid var(--line);border-radius:16px;padding:13px}
+.item button{width:100%;border:0;background:none;text-align:left;padding:0}
+.item b{font-size:13px;line-height:1.4;color:var(--text)}
+.item small{display:block;color:var(--muted);margin-top:4px}
+
+.card{background:#fff;border:2px solid var(--line);border-radius:20px;padding:16px}
+.brand{font-size:11.5px;color:var(--green-text);font-weight:800}
+.name{font-family:'Gaegu',sans-serif;font-size:18px;font-weight:400;line-height:1.35;margin:4px 0 10px;color:var(--text)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:10.5px;background:var(--soft);color:var(--accent);border-radius:999px;padding:5px 10px;font-weight:800}
+.tag.ok{background:var(--green);color:var(--green-text)}
+.tag.warn{background:var(--yellow);color:#8A6A00}
+
+.point{padding:12px 14px;border-radius:16px;margin-top:8px;font-size:12.5px;line-height:1.5}
+.point.key{background:var(--yellow);color:#5c4600}
+.point.fit{background:var(--green);color:#1f5b46}
+.point.info{background:var(--blue);color:#4a3a7a}
+.point.caution{background:var(--red);color:#7a2836}
+.point strong{display:block;font-size:11px;margin-bottom:4px;opacity:.85}
+
+.tiny{font-size:10.5px;color:var(--muted);line-height:1.4}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:8px 13px;font-size:11.5px}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:800}
+
+.compare-toolbar{display:flex;gap:7px;align-items:center}
+.compare-toolbar b{font-family:'Gaegu',sans-serif;font-weight:400;color:var(--text)}
+.compare-count{font-size:11.5px;color:var(--muted);margin-left:auto}
+
+.table-wrap{overflow:auto;background:#fff;border:2px solid var(--line);border-radius:16px}
+.compare-table{border-collapse:collapse;width:100%;min-width:640px;font-size:11px}
+.compare-table th,.compare-table td{border-bottom:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}
+.compare-table th{background:var(--soft);position:sticky;top:0;color:var(--accent)}
+
+.conclusion{margin-bottom:14px;padding:14px 16px;border-radius:18px;background:linear-gradient(to right,var(--accent),var(--accent2),var(--accent));color:#fff;font-size:12.5px;line-height:1.6}
+
+.profile-grid{display:grid;gap:10px}
+.profile-row{background:#fff;border:2px solid var(--line);border-radius:16px;padding:12px}
+.profile-row label{font-size:11.5px;color:var(--muted);display:block;margin-bottom:6px;font-weight:800}
+.profile-row select{width:100%;border:0;background:var(--soft);border-radius:12px;padding:10px;color:var(--text)}
+
+.category-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.category{border:2px solid var(--line);background:#fff;color:var(--muted);border-radius:14px;padding:10px;font-size:11.5px;text-align:left}
+.category.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:800}
+
+.result-grid{display:grid;gap:8px}
+.result{background:#fff;border:2px solid var(--line);border-radius:16px;padding:13px}
+.result h3{margin:0;font-family:'Gaegu',sans-serif;font-size:14px;line-height:1.4;font-weight:400;color:var(--text)}
+.result p{font-size:11.5px;line-height:1.45;margin:5px 0;color:var(--muted)}
+
+.foot{padding:16px 18px;color:var(--muted);font-size:10px;line-height:1.6}
+
+.compare-phone{display:grid;gap:10px}
+.compare-section{background:#fff;border:2px solid var(--line);border-radius:18px;overflow:hidden}
+.compare-section-head{padding:11px 14px;background:var(--soft);border-bottom:2px solid var(--line);font-size:12.5px;font-weight:800;color:var(--accent)}
+.compare-item{display:grid;grid-template-columns:82px 1fr;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);font-size:11.5px;line-height:1.45}
 .compare-item:last-child{border-bottom:0}
-.compare-product-name{font-weight:800;min-width:0}
-.compare-value{min-width:0;word-break:keep-all}
+.compare-product-name{font-weight:800;min-width:0;color:var(--text);word-break:keep-all}
+.compare-value{min-width:0;word-break:keep-all;color:var(--muted)}
+
+/* 하단 탭바 */
+.tabbar{
+  position:fixed;left:0;right:0;bottom:0;
+  max-width:480px;margin:0 auto;
+  height:64px;
+  background:#fff;
+  border-top:2px solid var(--line);
+  display:flex;align-items:center;justify-content:space-around;
+  z-index:20;
+}
+.tab-btn{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--muted);font-weight:800}
+.tab-btn .ico{font-size:19px}
+.tab-btn.active{color:var(--accent)}
 </style>
 </head>
 <body><main class="app">
-<header class="top"><h1>올영 직원 도우미</h1><p>장승배기역점 · DA22 · 1–3초 판매 보조</p></header>
+
+<div class="brandmark">올영 셀링 헬퍼 🎀</div>
+
+<header class="top">
+  <h1>장승배기역점</h1>
+  <p>DA22</p>
+</header>
 
 <section id="home" class="screen">
 <div class="home-grid">
@@ -38,7 +186,7 @@ button,input,select{font:inherit}.app{max-width:560px;margin:auto;min-height:100
 <section id="find" class="screen hidden">
 <button class="back" onclick="home()">← 홈</button><div class="section-title">상품 찾기</div>
 <div class="camera"><video id="video" playsinline></video><div class="camera-actions"><button class="btn" onclick="startScan()">바코드 스캔</button><button class="btn light" onclick="stopScan()">카메라 끄기</button></div><div class="camera-actions"><label class="btn light" style="text-align:center">📸 사진<input id="photoInput" type="file" accept="image/*" capture="environment" hidden onchange="scanPhoto(this.files[0])"></label></div></div>
-<div id="scanStatus" class="status">v2에서 확인된 바코드 인식 방식을 유지합니다.</div>
+<div id="scanStatus" class="status">바코드를 화면 중앙에 맞춰주세요.</div>
 <div class="search"><input id="productSearch" placeholder="예: 토리든 세럼 / 브랜드 / 바코드"><button class="btn" onclick="searchProducts()">검색</button></div>
 <div id="productResults" class="list" style="margin-top:9px"></div>
 </section>
@@ -51,7 +199,7 @@ button,input,select{font:inherit}.app{max-width:560px;margin:auto;min-height:100
 <div class="search"><input id="compareSearch" placeholder="상품명 / 브랜드 / 바코드"><button class="btn" onclick="searchCompare()">추가</button></div>
 <div id="compareCandidates" class="list" style="margin-top:8px"></div>
 <div class="compare-toolbar" style="margin-top:14px"><b>선택 상품</b><span id="compareCount" class="compare-count">0개</span><button class="btn light" onclick="clearCompare()">초기화</button></div>
-<div id="compareTable" style="margin-top:9px"></div>
+<div id="compareTable" style="margin-top:12px"></div>
 </section>
 
 <section id="consult" class="screen hidden">
@@ -72,6 +220,13 @@ button,input,select{font:inherit}.app{max-width:560px;margin:auto;min-height:100
 <footer class="foot">직원 판매 보조용입니다. 화장품의 효능을 의학적 치료로 표현하지 않습니다. 재고는 수집 시점 데이터이며 실시간 재고를 보장하지 않습니다. 상품 상세 원문을 앱에 그대로 복제하지 않고 구조화된 내부 분석을 저장하는 방향을 권장합니다.</footer>
 </main>
 
+<nav class="tabbar">
+  <button class="tab-btn" data-tab="home" onclick="show('home')"><span class="ico">🏠</span>홈</button>
+  <button class="tab-btn" data-tab="find" onclick="show('find')"><span class="ico">📷</span>찾기</button>
+  <button class="tab-btn" data-tab="compare" onclick="show('compare')"><span class="ico">⚖️</span>비교</button>
+  <button class="tab-btn" data-tab="consult" onclick="show('consult')"><span class="ico">💬</span>상담</button>
+</nav>
+
 <script>
 let DB={products:[],ingredients:[],concerns:[],product_ingredients:[],concern_ingredients:[],product_similarities:[]};
 let stream=null,scanControls=null,compareIds=[];
@@ -82,154 +237,177 @@ function normalize(s){return String(s??'').toLowerCase().normalize('NFKC').repla
 function tokens(q){return String(q||'').trim().toLowerCase().normalize('NFKC').split(/\s+/).filter(Boolean)}
 function fields(p){return [p.goodsName,p.brand,p.goodsNumber,p.barcode_master,p.barcodes_all,p.main_category,p.sub_category,p.leaf_category,p.standard_category,p.mvp_axis,p.customer_concerns,p.key_ingredients].map(normalize)}
 function matchToken(p,t){
- const f=fields(p), x=normalize(t); if(!x)return true;
- if(f.some(v=>v.includes(x)))return true;
- const aliases={'세럼':['세럼','앰플','에센스','serum','ampoule','essence'],'앰플':['앰플','세럼','에센스'],'에센스':['에센스','세럼','앰플'],'클렌저':['클렌저','폼','워시','cleanser','wash'],'쿠션':['쿠션','cushion'],'파운데이션':['파운데이션','foundation'],'컨실러':['컨실러','concealer'],'크림':['크림','cream'],'로션':['로션','lotion'],'토너':['토너','toner'],'패드':['패드','pad'],'립':['립','lip'],'아이섀도우':['아이섀도우','섀도','eyeshadow'],'블러셔':['블러셔','치크','blush']};
- return (aliases[t]||[]).some(a=>f.some(v=>v.includes(normalize(a))));
+const f=fields(p), x=normalize(t); if(!x)return true;
+if(f.some(v=>v.includes(x)))return true;
+const aliases={'세럼':['세럼','앰플','에센스','serum','ampoule','essence'],'앰플':['앰플','세럼','에센스'],'에센스':['에센스','세럼','앰플'],'클렌저':['클렌저','폼','워시','cleanser','wash'],'쿠션':['쿠션','cushion'],'파운데이션':['파운데이션','foundation'],'컨실러':['컨실러','concealer'],'크림':['크림','cream'],'로션':['로션','lotion'],'토너':['토너','toner'],'패드':['패드','pad'],'립':['립','lip'],'아이섀도우':['아이섀도우','섀도','eyeshadow'],'블러셔':['블러셔','치크','blush']};
+return (aliases[t]||[]).some(a=>f.some(v=>v.includes(normalize(a))));
 }
 function score(p,ts){let n=0,f=fields(p);for(const t of ts){const x=normalize(t);if(f.some(v=>v===x))n+=100;else if(f.some(v=>v.includes(x)))n+=50;else if(matchToken(p,t))n+=30}return n}
 function search(q,limit=12){const ts=tokens(q);return DB.products.filter(p=>ts.every(t=>matchToken(p,t))).map(p=>({p,s:score(p,ts)})).sort((a,b)=>b.s-a.s).slice(0,limit).map(x=>x.p)}
-function show(id){['home','find','product','compare','consult'].forEach(x=>$(x).classList.toggle('hidden',x!==id));stopScan()}
+
+/* 탭바 활성 표시까지 함께 처리하도록 확장 */
+function show(id){
+  ['home','find','product','compare','consult'].forEach(x=>$(x).classList.toggle('hidden',x!==id));
+  stopScan();
+  const tabId = id==='product' ? 'find' : id;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tabId));
+}
 function home(){show('home')}
+
 async function loadDB(){
- const r=await fetch('./oliveyoung_DA22_runtime_db_v4.json');DB=await r.json();
- $('dbSummary').textContent=`${DB.store} · 상품 ${DB.products.length.toLocaleString()}개 · 분석 완료 ${DB.products.filter(p=>p.verification_status==='verified').length}개`;
- renderFilters();
+const r=await fetch('./oliveyoung_DA22_runtime_db_v4.json');DB=await r.json();
+$('dbSummary').textContent=`${DB.store} · 상품 ${DB.products.length.toLocaleString()}개 · 분석 완료 ${DB.products.filter(p=>p.verification_status==='verified').length}개`;
+renderFilters();
+show('home');
 }
 function searchProducts(){
- const q=$('productSearch').value;const a=search(q);
- $('productResults').innerHTML=a.length?a.map(p=>`<div class="item"><button onclick="openProduct('${esc(p.goodsNumber)}')"><b>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</b><small>${esc(p.sub_category||p.standard_category||'')} · ${p.verification_status==='verified'?'✓ 분석 완료':'△ 분석 대기'} · 재고 ${p.current_stock??'-'}</small></button></div>`).join(''):'<div class="item">검색 결과가 없습니다.</div>';
+const q=$('productSearch').value;const a=search(q);
+$('productResults').innerHTML=a.length?a.map(p=>`<div class="item"><button onclick="openProduct('${esc(p.goodsNumber)}')"><b>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</b><small>${esc(p.sub_category||p.standard_category||'')} · ${p.verification_status==='verified'?'✓ 분석 완료':'△ 분석 대기'} · 재고 ${p.current_stock??'-'}</small></button></div>`).join(''):'<div class="item">검색 결과가 없습니다.</div>';
 }
 function openProduct(id){
- const p=DB.products.find(x=>x.goodsNumber===id);if(!p)return;
- show('product'); const verified=p.verification_status==='verified';
- const sim=DB.product_similarities.filter(x=>x.product_id===id).sort((a,b)=>Number(b.score||0)-Number(a.score||0)).slice(0,4).map(x=>DB.products.find(y=>y.goodsNumber===x.similar_product_id)).filter(Boolean);
- $('productDetail').innerHTML=`<div class="card">
- <div class="brand">${esc(p.brand)} · ${esc(p.sub_category||p.standard_category||'')}</div>
- <div class="name">${esc(cleanName(p.goodsName))}</div>
- <div class="tags"><span class="tag">${esc(p.mvp_axis||p.leaf_category||'')}</span><span class="tag ${verified?'ok':'warn'}">${verified?'✓ 분석 완료':'△ 분석 대기'}</span><span class="tag">재고 ${esc(p.current_stock??'-')}</span></div>
- ${verified?`<div class="point key"><strong>🟨 핵심 성분</strong>${esc(p.key_ingredients||'')}</div>
- <div class="point info"><strong>🟦 직원용 한마디</strong>${esc(p.selling_point_1||'')}</div>
- <div class="point info"><strong>🟦 추가 포인트</strong>${esc(p.selling_point_2||p.selling_point_3||'')}</div>
- <div class="point fit"><strong>🟩 이런 고객에게</strong>${esc(p.customer_concerns||'')}</div>
- <div class="point info"><strong>🟦 제형</strong>${esc(p.texture||'')}</div>
- ${p.caution?`<div class="point caution"><strong>🟥 주의</strong>${esc(p.caution)}</div>`:''}`
- :`<div class="point caution"><strong>현재 단계</strong>상품 식별만 가능합니다. 성분·효능을 추정하지 않습니다.</div>`}
- <div class="section-title">유사 상품</div>
- <div class="result-grid">${sim.length?sim.map(s=>`<div class="result"><h3>${esc(s.brand)} · ${esc(cleanName(s.goodsName))}</h3><p>${esc(s.key_ingredients||'분석 대기')}</p><button class="btn light" onclick="addCompare('${esc(s.goodsNumber)}')">비교에 추가</button></div>`).join(''):'<div class="tiny">현재 연결된 유사상품이 없습니다.</div>'}</div>
- <div style="display:flex;gap:7px;margin-top:10px"><button class="btn" onclick="addCompare('${esc(p.goodsNumber)}')">⚖️ 비교에 추가</button><button class="btn light" onclick="window.open('${esc(p.source_url)}','_blank')">원문 열기</button></div>
- </div>`;
+const p=DB.products.find(x=>x.goodsNumber===id);if(!p)return;
+show('product'); const verified=p.verification_status==='verified';
+const sim=DB.product_similarities.filter(x=>x.product_id===id).sort((a,b)=>Number(b.score||0)-Number(a.score||0)).slice(0,4).map(x=>DB.products.find(y=>y.goodsNumber===x.similar_product_id)).filter(Boolean);
+$('productDetail').innerHTML=`<div class="card">
+<div class="brand">${esc(p.brand)} · ${esc(p.sub_category||p.standard_category||'')}</div>
+<div class="name">${esc(cleanName(p.goodsName))}</div>
+<div class="tags"><span class="tag">${esc(p.mvp_axis||p.leaf_category||'')}</span><span class="tag ${verified?'ok':'warn'}">${verified?'✓ 분석 완료':'△ 분석 대기'}</span><span class="tag">재고 ${esc(p.current_stock??'-')}</span></div>
+${verified?`<div class="point key"><strong>🟨 핵심 성분</strong>${esc(p.key_ingredients||'')}</div>
+<div class="point info"><strong>🟦 직원용 한마디</strong>${esc(p.selling_point_1||'')}</div>
+<div class="point info"><strong>🟦 추가 포인트</strong>${esc(p.selling_point_2||p.selling_point_3||'')}</div>
+<div class="point fit"><strong>🟩 이런 고객에게</strong>${esc(p.customer_concerns||'')}</div>
+<div class="point info"><strong>🟦 제형</strong>${esc(p.texture||'')}</div>
+${p.caution?`<div class="point caution"><strong>🟥 주의</strong>${esc(p.caution)}</div>`:''}`
+:`<div class="point caution"><strong>현재 단계</strong>상품 식별만 가능합니다. 성분·효능을 추정하지 않습니다.</div>`}
+<div class="section-title">유사 상품</div>
+<div class="result-grid">${sim.length?sim.map(s=>`<div class="result"><h3>${esc(s.brand)} · ${esc(cleanName(s.goodsName))}</h3><p>${esc(s.key_ingredients||'분석 대기')}</p><button class="btn light" onclick="addCompare('${esc(s.goodsNumber)}')">비교에 추가</button></div>`).join(''):'<div class="tiny">현재 연결된 유사상품이 없습니다.</div>'}</div>
+<div style="display:flex;gap:7px;margin-top:10px"><button class="btn" onclick="addCompare('${esc(p.goodsNumber)}')">⚖️ 비교에 추가</button><button class="btn light" onclick="window.open('${esc(p.source_url)}','_blank')">원문 열기</button></div>
+</div>`;
 }
 function searchCompare(){
- const q=$('compareSearch').value;const a=search(q,8);
- $('compareCandidates').innerHTML=a.map(p=>`<div class="item"><button onclick="addCompare('${esc(p.goodsNumber)}')"><b>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</b><small>${p.verification_status==='verified'?'✓ 분석 완료':'△ 분석 대기'}</small></button></div>`).join('')||'<div class="item">검색 결과가 없습니다.</div>';
+const q=$('compareSearch').value;const a=search(q,8);
+$('compareCandidates').innerHTML=a.map(p=>`<div class="item"><button onclick="addCompare('${esc(p.goodsNumber)}')"><b>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</b><small>${p.verification_status==='verified'?'✓ 분석 완료':'△ 분석 대기'}</small></button></div>`).join('')||'<div class="item">검색 결과가 없습니다.</div>';
 }
 function addCompare(id){if(compareIds.includes(id))return;if(compareIds.length>=5){alert('비교는 최대 5개까지 가능합니다.');return}compareIds.push(id);renderCompare()}
 function removeCompare(id){compareIds=compareIds.filter(x=>x!==id);renderCompare()}
 function clearCompare(){compareIds=[];renderCompare()}
-function renderCompare(){
- $('compareCount').textContent=`${compareIds.length}개`;
- const ps=compareIds.map(id=>DB.products.find(p=>p.goodsNumber===id)).filter(Boolean);
- if(!ps.length){$('compareTable').innerHTML='<div class="item tiny">상품을 검색해 추가하세요.</div>';return}
- const rows=[
-  ['핵심 성분',p=>p.key_ingredients||'분석 대기'],
-  ['추천 고객',p=>p.customer_concerns||'분석 대기'],
-  ['제형',p=>p.texture||'분석 대기'],
-  ['직원용 포인트',p=>p.selling_point_1||'분석 대기'],
-  ['분석 상태',p=>p.verification_status==='verified'?'✓ 완료':'△ 분석 대기']
- ];
- let h='<div class="compare-phone">';
- rows.forEach(([label,fn])=>{
-   h+=`<section class="compare-section"><div class="compare-section-head">${esc(label)}</div>`;
-   ps.forEach(p=>{
-     const shortName=cleanName(p.goodsName);
-     h+=`<div class="compare-item"><div class="compare-product-name">${esc(p.brand)}<br><span class="tiny">${esc(shortName)}</span></div><div class="compare-value">${esc(fn(p))}</div></div>`;
-   });
-   h+='</section>';
- });
- h+='<section class="compare-section"><div class="compare-section-head">선택 상품</div>';
- ps.forEach(p=>{
-   h+=`<div class="compare-item"><div class="compare-product-name">${esc(p.brand)}<br><span class="tiny">${esc(cleanName(p.goodsName))}</span></div><div class="compare-value"><button class="btn light" onclick="removeCompare('${esc(p.goodsNumber)}')">비교에서 제거</button></div></div>`;
- });
- h+='</section></div>';
- const verified=ps.filter(p=>p.verification_status==='verified');
- const conclusion=verified.length?`${verified.map(p=>`${p.brand}는 ${p.customer_concerns||'추천 고객 정보'}에 유리`).join(' / ')}.`:'현재 선택 상품 중 분석 완료 데이터가 없어 성분 기반 결론을 만들지 않습니다.';
- $('compareTable').innerHTML=h+`<div class="conclusion">한 줄 결론: ${esc(conclusion)}</div>`;
+
+/* 같은 브랜드가 2개 이상이면 상품명에서 핵심 표현을 뽑아 "브랜드(표현)"으로 구분 표시 */
+function compareLabel(p, ps){
+  const dupCount = ps.filter(x=>x.brand===p.brand).length;
+  if(dupCount<2) return esc(p.brand);
+  const nm = cleanName(p.goodsName);
+  let key = '';
+  const ingr = (p.key_ingredients||'').split(/[,\s]+/).filter(Boolean)[0];
+  if(ingr && ingr.length<=8) key = ingr;
+  if(!key){
+    const words = nm.replace(new RegExp('^'+p.brand),'').trim().split(/\s+/).filter(Boolean);
+    key = words[0] || '';
+  }
+  return key ? `${esc(p.brand)}(${esc(key)})` : esc(p.brand);
 }
 
+function renderCompare(){
+$('compareCount').textContent=`${compareIds.length}개`;
+const ps=compareIds.map(id=>DB.products.find(p=>p.goodsNumber===id)).filter(Boolean);
+if(!ps.length){$('compareTable').innerHTML='<div class="item tiny">상품을 검색해 추가하세요.</div>';return}
+const rows=[
+['핵심 성분',p=>p.key_ingredients||'분석 대기'],
+['추천 고객',p=>p.customer_concerns||'분석 대기'],
+['제형',p=>p.texture||'분석 대기'],
+['직원용 포인트',p=>p.selling_point_1||'분석 대기'],
+['분석 상태',p=>p.verification_status==='verified'?'✓ 완료':'△ 분석 대기']
+];
+let h='<div class="compare-phone">';
+rows.forEach(([label,fn])=>{
+h+=`<section class="compare-section"><div class="compare-section-head">${esc(label)}</div>`;
+ps.forEach(p=>{
+h+=`<div class="compare-item"><div class="compare-product-name">${compareLabel(p,ps)}</div><div class="compare-value">${esc(fn(p))}</div></div>`;
+});
+h+='</section>';
+});
+h+='<section class="compare-section"><div class="compare-section-head">선택 상품</div>';
+ps.forEach(p=>{
+h+=`<div class="compare-item"><div class="compare-product-name">${compareLabel(p,ps)}<br><span class="tiny">${esc(cleanName(p.goodsName))}</span></div><div class="compare-value"><button class="btn light" onclick="removeCompare('${esc(p.goodsNumber)}')">비교에서 제거</button></div></div>`;
+});
+h+='</section></div>';
+const verified=ps.filter(p=>p.verification_status==='verified');
+const conclusion=verified.length?`${verified.map(p=>`${compareLabel(p,ps)}는 ${p.customer_concerns||'추천 고객 정보'}에 유리`).join(' / ')}.`:'현재 선택 상품 중 분석 완료 데이터가 없어 성분 기반 결론을 만들지 않습니다.';
+/* 검색창 -> 한줄요약 -> 비교표 순서로 보이도록, 한줄요약을 비교표보다 먼저 렌더링 */
+$('compareTable').innerHTML=`<div class="conclusion">한 줄 결론: ${conclusion}</div>`+h;
+}
 function renderFilters(){
- const cats=['클렌징','스킨케어','선케어','베이스 메이크업','립 메이크업','아이 메이크업','블러셔'];
- $('categoryGrid').innerHTML=cats.map(c=>`<button class="category" data-cat="${esc(c)}" onclick="this.classList.toggle('on')">${esc(c)}</button>`).join('');
- const concerns=DB.concerns.map(x=>x.name);
- $('concernGrid').innerHTML=concerns.map(c=>`<button class="chip" data-concern="${esc(c)}" onclick="this.classList.toggle('on')">${esc(c)}</button>`).join('');
+const cats=['클렌징','스킨케어','선케어','베이스 메이크업','립 메이크업','아이 메이크업','블러셔'];
+$('categoryGrid').innerHTML=cats.map(c=>`<button class="category" data-cat="${esc(c)}" onclick="this.classList.toggle('on')">${esc(c)}</button>`).join('');
+const concerns=DB.concerns.map(x=>x.name);
+$('concernGrid').innerHTML=concerns.map(c=>`<button class="chip" data-concern="${esc(c)}" onclick="this.classList.toggle('on')">${esc(c)}</button>`).join('');
 }
 function consult(){
- const skin=$('skinType').value, mc=$('makeupConcern').value;
- const cats=[...document.querySelectorAll('.category.on')].map(x=>x.dataset.cat);
- const concerns=[...document.querySelectorAll('.chip.on')].map(x=>x.dataset.concern);
- let qs=[...concerns];if(mc)qs.push(mc);
- const candidates=DB.products.filter(p=>p.verification_status==='verified').filter(p=>{
-   const hay=normalize([p.main_category,p.sub_category,p.standard_category,p.customer_concerns,p.mvp_axis,p.key_ingredients,p.selling_point_1].join(' '));
-   const catOK=!cats.length||cats.some(c=>hay.includes(normalize(c).replace('메이크업','')));
-   const concernOK=!qs.length||qs.some(c=>hay.includes(normalize(c)));
-   const skinOK=!skin||normalize(p.customer_concerns).includes(normalize(skin));
-   return catOK&&(concernOK||skinOK);
- }).slice(0,12);
- let special='';
- if(mc==='다크서클' && (cats.includes('스킨케어')||cats.includes('베이스 메이크업'))){
-   special='<div class="conclusion">상담 포인트: 다크서클은 <b>케어 제품 + 메이크업 커버</b>를 함께 제안할 수 있도록 구성하세요. 현재 DB에서 확인된 상품만 근거로 추천합니다.</div>';
- }
- $('consultResults').innerHTML=special+`<div class="section-title">추천 결과</div><div class="result-grid">${candidates.map(p=>`<div class="result"><h3>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</h3><p>${esc(p.selling_point_1||p.key_ingredients||'')}</p><p>${esc(p.customer_concerns||'')}</p><button class="btn light" onclick="openProduct('${esc(p.goodsNumber)}')">상품 보기</button></div>`).join('')||'<div class="item">현재 분석 DB에서 조건에 맞는 상품이 없습니다.</div>'}</div>`;
+const skin=$('skinType').value, mc=$('makeupConcern').value;
+const cats=[...document.querySelectorAll('.category.on')].map(x=>x.dataset.cat);
+const concerns=[...document.querySelectorAll('.chip.on')].map(x=>x.dataset.concern);
+let qs=[...concerns];if(mc)qs.push(mc);
+const candidates=DB.products.filter(p=>p.verification_status==='verified').filter(p=>{
+const hay=normalize([p.main_category,p.sub_category,p.standard_category,p.customer_concerns,p.mvp_axis,p.key_ingredients,p.selling_point_1].join(' '));
+const catOK=!cats.length||cats.some(c=>hay.includes(normalize(c).replace('메이크업','')));
+const concernOK=!qs.length||qs.some(c=>hay.includes(normalize(c)));
+const skinOK=!skin||normalize(p.customer_concerns).includes(normalize(skin));
+return catOK&&(concernOK||skinOK);
+}).slice(0,12);
+let special='';
+if(mc==='다크서클' && (cats.includes('스킨케어')||cats.includes('베이스 메이크업'))){
+special='<div class="conclusion">상담 포인트: 다크서클은 <b>케어 제품 + 메이크업 커버</b>를 함께 제안할 수 있도록 구성하세요. 현재 DB에서 확인된 상품만 근거로 추천합니다.</div>';
+}
+$('consultResults').innerHTML=special+`<div class="section-title">추천 결과</div><div class="result-grid">${candidates.map(p=>`<div class="result"><h3>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</h3><p>${esc(p.selling_point_1||p.key_ingredients||'')}</p><p>${esc(p.customer_concerns||'')}</p><button class="btn light" onclick="openProduct('${esc(p.goodsNumber)}')">상품 보기</button></div>`).join('')||'<div class="item">현재 분석 DB에서 조건에 맞는 상품이 없습니다.</div>'}</div>`;
 }
 let zxingPromise=null;
 function loadZXing(){
- if(window.ZXingBrowser)return Promise.resolve(window.ZXingBrowser);
- if(window.ZXing)return Promise.resolve(window.ZXing);
- if(zxingPromise)return zxingPromise;
- zxingPromise=new Promise((resolve,reject)=>{
-   const sc=document.createElement('script');
-   sc.src='https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js';
-   sc.async=true;
-   sc.onload=()=>{const api=window.ZXingBrowser||window.ZXing;if(api)resolve(api);else reject(new Error('ZXing 전역 객체 생성 실패'));};
-   sc.onerror=()=>reject(new Error('ZXing CDN 로드 실패'));
-   document.head.appendChild(sc);
- });
- return zxingPromise;
+if(window.ZXingBrowser)return Promise.resolve(window.ZXingBrowser);
+if(window.ZXing)return Promise.resolve(window.ZXing);
+if(zxingPromise)return zxingPromise;
+zxingPromise=new Promise((resolve,reject)=>{
+const sc=document.createElement('script');
+sc.src='https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js';
+sc.async=true;
+sc.onload=()=>{const api=window.ZXingBrowser||window.ZXing;if(api)resolve(api);else reject(new Error('ZXing 전역 객체 생성 실패'));};
+sc.onerror=()=>reject(new Error('ZXing CDN 로드 실패'));
+document.head.appendChild(sc);
+});
+return zxingPromise;
 }
 async function startScan(){
- stopScan();
- if(!window.isSecureContext){$('scanStatus').textContent='카메라는 HTTPS에서만 사용할 수 있습니다.';return}
- $('scanStatus').textContent='바코드 모듈을 준비하는 중…';
- try{
-   const ZX=await loadZXing();
-   const Reader=ZX.BrowserMultiFormatReader||ZX.BrowserMultiFormatOneDReader;
-   if(!Reader)throw new Error('ZXing Reader 생성 실패');
-   const reader=new Reader();
-   scanControls=await reader.decodeFromConstraints({video:{facingMode:{ideal:'environment'},width:{ideal:640},height:{ideal:480},frameRate:{ideal:30,max:30}}},$('video'),(result,error)=>{
-     if(result){
-       const code=result.getText();$('scanStatus').textContent=`인식: ${code}`;stopScan();
-       const p=DB.products.find(x=>String(x.barcode_master)===String(code)||String(x.barcodes_all||'').split(' ').includes(String(code)));
-       if(p)openProduct(p.goodsNumber);else{$('productSearch').value=code;searchProducts()}
-     }
-   });
-   $('scanStatus').textContent='바코드를 화면 중앙에 맞춰주세요.';
- }catch(e){$('scanStatus').textContent=`바코드 스캔을 시작하지 못했습니다: ${e.message||e.name||e}`;}
+stopScan();
+if(!window.isSecureContext){$('scanStatus').textContent='카메라는 HTTPS에서만 사용할 수 있습니다.';return}
+$('scanStatus').textContent='바코드 모듈을 준비하는 중…';
+try{
+const ZX=await loadZXing();
+const Reader=ZX.BrowserMultiFormatReader||ZX.BrowserMultiFormatOneDReader;
+if(!Reader)throw new Error('ZXing Reader 생성 실패');
+const reader=new Reader();
+scanControls=await reader.decodeFromConstraints({video:{facingMode:{ideal:'environment'},width:{ideal:640},height:{ideal:480},frameRate:{ideal:30,max:30}}},$('video'),(result,error)=>{
+if(result){
+const code=result.getText();$('scanStatus').textContent=`인식: ${code}`;stopScan();
+const p=DB.products.find(x=>String(x.barcode_master)===String(code)||String(x.barcodes_all||'').split(' ').includes(String(code)));
+if(p)openProduct(p.goodsNumber);else{$('productSearch').value=code;searchProducts()}
+}
+});
+$('scanStatus').textContent='바코드를 화면 중앙에 맞춰주세요.';
+}catch(e){$('scanStatus').textContent=`바코드 스캔을 시작하지 못했습니다: ${e.message||e.name||e}`;}
 }
 function stopScan(){try{if(scanControls&&scanControls.stop)scanControls.stop()}catch{}scanControls=null;if($('video')?.srcObject){$('video').srcObject.getTracks().forEach(t=>t.stop());$('video').srcObject=null}}
 async function scanPhoto(file){
- if(!file)return;
- try{
-   const ZX=await loadZXing();$('scanStatus').textContent='사진에서 바코드를 찾는 중…';
-   const r=new ZX.BrowserMultiFormatReader();const url=URL.createObjectURL(file);
-   const result=await r.decodeFromImageUrl(url);URL.revokeObjectURL(url);
-   const code=result.getText();$('scanStatus').textContent=`인식: ${code}`;
-   const p=DB.products.find(x=>String(x.barcode_master)===String(code)||String(x.barcodes_all||'').split(' ').includes(String(code)));
-   if(p)openProduct(p.goodsNumber);else{$('productSearch').value=code;searchProducts()}
- }catch(e){$('scanStatus').textContent='사진에서 바코드를 찾지 못했습니다. 상품명을 검색해 주세요.'}
+if(!file)return;
+try{
+const ZX=await loadZXing();$('scanStatus').textContent='사진에서 바코드를 찾는 중…';
+const r=new ZX.BrowserMultiFormatReader();const url=URL.createObjectURL(file);
+const result=await r.decodeFromImageUrl(url);URL.revokeObjectURL(url);
+const code=result.getText();$('scanStatus').textContent=`인식: ${code}`;
+const p=DB.products.find(x=>String(x.barcode_master)===String(code)||String(x.barcodes_all||'').split(' ').includes(String(code)));
+if(p)openProduct(p.goodsNumber);else{$('productSearch').value=code;searchProducts()}
+}catch(e){$('scanStatus').textContent='사진에서 바코드를 찾지 못했습니다. 상품명을 검색해 주세요.'}
 }
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
 loadDB().catch(e=>$('dbSummary').textContent='DB 로드 실패: '+e.message);
-// 다음에 스캔 버튼을 누를 때까지 기다리지 않고, 앱이 열린 뒤 백그라운드에서 ZXing을 미리 준비합니다.
 window.addEventListener('load',()=>{setTimeout(()=>loadZXing().catch(()=>{}),250);});
 </script>
 </body></html>
