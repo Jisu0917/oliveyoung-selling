@@ -1,154 +1,176 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111111"><link rel="manifest" href="manifest.webmanifest">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111">
+<link rel="manifest" href="manifest.webmanifest">
 <title>올영 직원 도우미 · DA22</title>
 <script src="https://cdn.jsdelivr.net/npm/@zxing/browser@0.2.1/umd/zxing-browser.min.js"></script>
 <style>
-:root{--bg:#f6f6f6;--card:#fff;--text:#171717;--muted:#777;--line:#e8e8e8;--accent:#111;--soft:#f0f0f0;--danger:#b42318}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR",sans-serif}button,input{font:inherit}button{cursor:pointer}.app{max-width:520px;margin:auto;min-height:100vh;padding-bottom:32px}.top{padding:22px 18px 12px;background:#fff;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line)}.top h1{font-size:20px;margin:0 0 4px}.top p{margin:0;color:var(--muted);font-size:12px}.screen{padding:18px}.home-grid{display:grid;gap:12px;margin-top:8px}.home-btn{background:#111;color:#fff;border:0;border-radius:18px;padding:24px 20px;text-align:left;box-shadow:0 4px 12px #00000012}.home-btn b{display:block;font-size:20px;margin-bottom:6px}.home-btn span{font-size:13px;opacity:.75}.home-btn.alt{background:#fff;color:#111;border:1px solid var(--line);box-shadow:none}.section-title{font-size:15px;font-weight:800;margin:20px 0 10px}.search{display:flex;gap:8px}.search input{flex:1;border:1px solid var(--line);border-radius:13px;padding:13px;background:#fff;outline:none}.btn{border:0;border-radius:12px;padding:11px 14px;background:#111;color:#fff;font-weight:700}.btn.light{background:#eee;color:#222}.btn.full{width:100%}.list{display:grid;gap:8px}.item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px}.item b{font-size:14px}.item small{display:block;color:var(--muted);margin-top:4px}.item button{border:0;background:none;text-align:left;width:100%;padding:0}.camera{background:#111;border-radius:18px;overflow:hidden}.camera video{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}.camera-actions{display:flex;gap:8px;padding:10px}.camera-actions .btn{flex:1}.status{font-size:12px;color:var(--muted);margin:10px 0}.back{border:0;background:none;padding:0 0 8px;font-size:13px;color:var(--muted)}.product-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}.brand{font-size:12px;color:var(--muted);font-weight:700}.product-name{font-size:19px;line-height:1.35;font-weight:850;margin:5px 0 12px}.tags{display:flex;flex-wrap:wrap;gap:6px}.tag{font-size:11px;padding:6px 9px;border-radius:999px;background:var(--soft)}.verified{background:#eaf7ee;color:#176b35}.pending{background:#fff5df;color:#8a5b00}.points{margin-top:14px;display:grid;gap:8px}.point{background:#f7f7f7;border-radius:12px;padding:11px 12px;font-size:13px;line-height:1.45}.point strong{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}.caution{margin-top:12px;background:#fff7f7;border:1px solid #f1d6d6;color:#8b2d2d;border-radius:12px;padding:11px;font-size:12px;line-height:1.45}.compare-grid{display:grid;gap:10px;margin-top:12px}.compare{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px}.compare h3{margin:0 0 6px;font-size:14px}.compare p{margin:4px 0;font-size:12px;line-height:1.45}.concerns{display:flex;flex-wrap:wrap;gap:8px}.concern{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;font-size:12px}.concern.on{background:#111;color:#fff;border-color:#111}.empty{padding:28px 10px;text-align:center;color:var(--muted);font-size:13px}.foot{padding:20px 18px;color:#999;font-size:10px;line-height:1.5}.link{color:#555;text-decoration:underline}.hidden{display:none!important}@media(min-width:700px){body{background:#e9e9e9}.app{background:var(--bg);box-shadow:0 0 40px #00000012}}
+:root{--bg:#f5f5f5;--card:#fff;--text:#171717;--muted:#777;--line:#e6e6e6;--accent:#111;--soft:#f0f0f0;--green:#eaf7ee;--yellow:#fff4d6;--blue:#eef5ff;--red:#fff1f1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR",sans-serif}
+button,input,select{font:inherit}.app{max-width:560px;margin:auto;min-height:100vh;padding-bottom:30px}.top{padding:20px 18px 12px;background:#fff;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line)}.top h1{font-size:20px;margin:0 0 3px}.top p{font-size:12px;color:var(--muted);margin:0}
+.screen{padding:16px 18px}.hidden{display:none!important}.section-title{font-size:15px;font-weight:900;margin:18px 0 9px}.home-grid{display:grid;gap:10px;margin-top:8px}.home-btn{border:0;border-radius:18px;padding:21px 18px;text-align:left;background:#111;color:#fff}.home-btn.alt{background:#fff;color:#111;border:1px solid var(--line)}.home-btn b{display:block;font-size:18px;margin-bottom:5px}.home-btn span{font-size:12px;opacity:.72}.search{display:flex;gap:7px}.search input{min-width:0;flex:1;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.btn{border:0;border-radius:11px;padding:10px 13px;background:#111;color:#fff;font-weight:800}.btn.light{background:#eee;color:#222}.btn.full{width:100%}.back{border:0;background:none;color:#777;padding:0 0 8px}.camera{overflow:hidden;border-radius:17px;background:#111}.camera video{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}.camera-actions{display:flex;gap:7px;padding:8px}.camera-actions>*{flex:1}.status{font-size:11px;color:#777;margin:8px 0}.list{display:grid;gap:8px}.item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.item button{width:100%;border:0;background:none;text-align:left;padding:0}.item b{font-size:13px;line-height:1.4}.item small{display:block;color:#777;margin-top:4px}.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px}.brand{font-size:12px;color:#777;font-weight:800}.name{font-size:19px;font-weight:900;line-height:1.35;margin:4px 0 10px}.tags{display:flex;gap:6px;flex-wrap:wrap}.tag{font-size:10px;background:var(--soft);border-radius:999px;padding:6px 8px}.tag.ok{background:var(--green);color:#176b35}.tag.warn{background:var(--yellow);color:#805800}.point{padding:11px 12px;border-radius:12px;margin-top:7px;font-size:13px;line-height:1.45}.point.key{background:var(--yellow)}.point.fit{background:var(--green)}.point.info{background:var(--blue)}.point.caution{background:var(--red);color:#7c2727}.point strong{display:block;font-size:10px;color:#666;margin-bottom:3px}.tiny{font-size:10px;color:#888;line-height:1.4}.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 11px;font-size:11px}.chip.on{background:#111;color:#fff;border-color:#111}.compare-toolbar{display:flex;gap:7px;align-items:center}.compare-count{font-size:11px;color:#777;margin-left:auto}.table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:14px}.compare-table{border-collapse:collapse;width:100%;min-width:640px;font-size:11px}.compare-table th,.compare-table td{border-bottom:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}.compare-table th{background:#fafafa;position:sticky;top:0}.conclusion{margin-top:10px;padding:12px;border-radius:13px;background:#111;color:#fff;font-size:12px;line-height:1.5}.profile-grid{display:grid;gap:8px}.profile-row{background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px}.profile-row label{font-size:10px;color:#777;display:block;margin-bottom:5px;font-weight:800}.profile-row select{width:100%;border:0;background:#f5f5f5;border-radius:9px;padding:9px}.category-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.category{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px;font-size:11px;text-align:left}.category.on{background:#111;color:#fff;border-color:#111}.result-grid{display:grid;gap:8px}.result{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.result h3{margin:0;font-size:13px;line-height:1.4}.result p{font-size:11px;line-height:1.45;margin:5px 0}.foot{padding:16px 18px;color:#999;font-size:10px;line-height:1.5}
 </style>
 </head>
 <body><main class="app">
-<header class="top"><h1>올영 직원 도우미</h1><p>장승배기역점 · DA22 · 빠른 판매 보조</p></header>
+<header class="top"><h1>올영 직원 도우미</h1><p>장승배기역점 · DA22 · 1–3초 판매 보조</p></header>
+
 <section id="home" class="screen">
-<div class="home-grid"><button class="home-btn" onclick="show('find')"><b>📷 상품 찾기</b><span>바코드 → 상품명 검색 → 판매 포인트 → 비교</span></button><button class="home-btn alt" onclick="show('concern')"><b>🔎 고객 고민 찾기</b><span>고민 선택 → 성분 우선순위 → 추천 상품 → 비교</span></button></div>
-<div class="section-title">MVP 범위</div><div class="item"><small>현재 50개 상품 중 검증 완료된 상품의 상세 분석을 우선 표시합니다. 검증 대기 상품은 상품 식별까지만 지원합니다.</small></div>
+<div class="home-grid">
+<button class="home-btn" onclick="show('find')"><b>📷 상품 찾기</b><span>바코드 / 검색 → 핵심 포인트 → 유사상품</span></button>
+<button class="home-btn alt" onclick="show('consult')"><b>👥 고객 상담</b><span>피부타입 + 고민 + 카테고리 → 맞춤 추천</span></button>
+<button class="home-btn alt" onclick="show('compare')"><b>⚖️ 상품 비교</b><span>바코드 / 검색으로 여러 상품 추가 → 비교표</span></button>
+</div>
+<div class="section-title">현재 데이터</div>
+<div class="item"><b id="dbSummary">DB 불러오는 중…</b><small>재고 0인 상품도 상품 마스터에 남기는 구조입니다. 분석 완료 상품은 현재 MVP 검증 데이터가 연결됩니다.</small></div>
 </section>
-<section id="find" class="screen hidden"><button class="back" onclick="home()">← 홈</button><div class="section-title">상품 찾기</div>
-<div class="camera"><video id="video" playsinline></video><div class="camera-actions"><button class="btn" onclick="startScan()">바코드 스캔</button><button class="btn light" onclick="stopScan()">카메라 끄기</button></div>
-<div class="camera-actions"><label class="btn light" style="text-align:center">📸 사진으로 찾기<input id="photoInput" type="file" accept="image/*" capture="environment" hidden onchange="scanPhoto(this.files[0])"></label></div></div><div id="scanStatus" class="status">바코드 인식이 지원되는 브라우저에서는 카메라로 바로 찾을 수 있습니다.</div>
-<div class="search"><input id="productSearch" placeholder="상품명 / 브랜드 / 바코드 검색"><button class="btn" onclick="searchProducts()">검색</button></div><div id="productResults" class="list" style="margin-top:10px"></div></section>
-<section id="product" class="screen hidden"><button class="back" onclick="show('find')">← 상품 검색</button><div id="productDetail"></div></section>
-<section id="concern" class="screen hidden"><button class="back" onclick="home()">← 홈</button><div class="section-title">고객 고민을 선택하세요</div><div id="concernList" class="concerns"></div><button class="btn full" style="margin-top:14px" onclick="recommend()">추천 결과 보기</button><div id="concernResults"></div></section>
-<footer class="foot">본 도구는 직원 판매 보조용 MVP입니다. 화장품의 성분·효과를 의학적 진단이나 치료로 표현하지 않습니다. 재고는 수집 시점 데이터이며 실시간 재고를 보장하지 않습니다. <span id="sourceNote"></span></footer>
+
+<section id="find" class="screen hidden">
+<button class="back" onclick="home()">← 홈</button><div class="section-title">상품 찾기</div>
+<div class="camera"><video id="video" playsinline></video><div class="camera-actions"><button class="btn" onclick="startScan()">바코드 스캔</button><button class="btn light" onclick="stopScan()">카메라 끄기</button></div><div class="camera-actions"><label class="btn light" style="text-align:center">📸 사진<input id="photoInput" type="file" accept="image/*" capture="environment" hidden onchange="scanPhoto(this.files[0])"></label></div></div>
+<div id="scanStatus" class="status">v2에서 확인된 바코드 인식 방식을 유지합니다.</div>
+<div class="search"><input id="productSearch" placeholder="예: 토리든 세럼 / 브랜드 / 바코드"><button class="btn" onclick="searchProducts()">검색</button></div>
+<div id="productResults" class="list" style="margin-top:9px"></div>
+</section>
+
+<section id="product" class="screen hidden"><button class="back" onclick="show('find')">← 상품 찾기</button><div id="productDetail"></div></section>
+
+<section id="compare" class="screen hidden">
+<button class="back" onclick="home()">← 홈</button>
+<div class="section-title">상품 비교</div>
+<div class="search"><input id="compareSearch" placeholder="상품명 / 브랜드 / 바코드"><button class="btn" onclick="searchCompare()">추가</button></div>
+<div id="compareCandidates" class="list" style="margin-top:8px"></div>
+<div class="compare-toolbar" style="margin-top:14px"><b>선택 상품</b><span id="compareCount" class="compare-count">0개</span><button class="btn light" onclick="clearCompare()">초기화</button></div>
+<div id="compareTable" style="margin-top:9px"></div>
+</section>
+
+<section id="consult" class="screen hidden">
+<button class="back" onclick="home()">← 홈</button>
+<div class="section-title">고객 상담</div>
+<div class="profile-grid">
+<div class="profile-row"><label>피부 타입</label><select id="skinType"><option value="">선택 안 함</option><option>건성</option><option>지성</option><option>복합성</option><option>민감성</option><option>수부지</option></select></div>
+<div class="profile-row"><label>메이크업/고객 고민</label><select id="makeupConcern"><option value="">선택 안 함</option><option>건조</option><option>피지</option><option>모공</option><option>트러블 흔적</option><option>다크서클</option><option>커버력</option><option>붉은기</option><option>피부톤</option></select></div>
+</div>
+<div class="section-title">찾는 카테고리 <span class="tiny">복수 선택</span></div>
+<div id="categoryGrid" class="category-grid"></div>
+<div class="section-title">세부 고민 <span class="tiny">복수 선택</span></div>
+<div id="concernGrid" class="chips"></div>
+<button class="btn full" style="margin-top:13px" onclick="consult()">맞춤 추천 보기</button>
+<div id="consultResults"></div>
+</section>
+
+<footer class="foot">직원 판매 보조용입니다. 화장품의 효능을 의학적 치료로 표현하지 않습니다. 재고는 수집 시점 데이터이며 실시간 재고를 보장하지 않습니다. 상품 상세 원문을 앱에 그대로 복제하지 않고 구조화된 내부 분석을 저장하는 방향을 권장합니다.</footer>
 </main>
+
 <script>
-let DB={products:[],ingredients:[],concerns:[],product_ingredients:[],concern_ingredients:[],product_similarities:[]};let stream=null,scanTimer=null;
-async function loadDB(){const r=await fetch('./oliveyoung_DA22_MVP_app_db_v1.json');DB=await r.json();document.getElementById('sourceNote').textContent=`DB ${DB.schema_version} · ${DB.products.length}개 MVP` ;renderConcerns()}
-function $(id){return document.getElementById(id)}
-function show(id){['home','find','product','concern'].forEach(x=>$(x).classList.toggle('hidden',x!==id));if(id==='find') $('productSearch').focus()}
-function home(){stopScan();show('home')}
-function normalizeSearch(s){
-  return String(s??'').toLowerCase().normalize('NFKC').replace(/[\s\-_/·•.,()[\]{}:;'"+=!?]+/g,'');
+let DB={products:[],ingredients:[],concerns:[],product_ingredients:[],concern_ingredients:[],product_similarities:[]};
+let stream=null,scanControls=null,compareIds=[];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const cleanName=s=>String(s||'').replace(/^\[[^\]]+\]\s*/,'').replace(/\s*기획.*$/,'').trim();
+function normalize(s){return String(s??'').toLowerCase().normalize('NFKC').replace(/[\s\-_/·•.,()[\]{}:;'"+=!?]+/g,'')}
+function tokens(q){return String(q||'').trim().toLowerCase().normalize('NFKC').split(/\s+/).filter(Boolean)}
+function fields(p){return [p.goodsName,p.brand,p.goodsNumber,p.barcode_master,p.barcodes_all,p.main_category,p.sub_category,p.leaf_category,p.standard_category,p.mvp_axis,p.customer_concerns,p.key_ingredients].map(normalize)}
+function matchToken(p,t){
+ const f=fields(p), x=normalize(t); if(!x)return true;
+ if(f.some(v=>v.includes(x)))return true;
+ const aliases={'세럼':['세럼','앰플','에센스','serum','ampoule','essence'],'앰플':['앰플','세럼','에센스'],'에센스':['에센스','세럼','앰플'],'클렌저':['클렌저','폼','워시','cleanser','wash'],'쿠션':['쿠션','cushion'],'파운데이션':['파운데이션','foundation'],'컨실러':['컨실러','concealer'],'크림':['크림','cream'],'로션':['로션','lotion'],'토너':['토너','toner'],'패드':['패드','pad'],'립':['립','lip'],'아이섀도우':['아이섀도우','섀도','eyeshadow'],'블러셔':['블러셔','치크','blush']};
+ return (aliases[t]||[]).some(a=>f.some(v=>v.includes(normalize(a))));
 }
-function searchTokens(q){
-  return String(q??'').toLowerCase().normalize('NFKC').split(/\s+/).map(x=>x.trim()).filter(Boolean);
-}
-function tokenMatches(product, token){
-  const t=normalizeSearch(token); if(!t)return true;
-  const fields=[product.goodsName,product.brand,product.goodsNumber,String(product.barcode_master||''),product.barcodes_all,product.standard_category,product.sub_category,product.main_category,product.mvp_axis,product.customer_concerns,product.key_ingredients].map(normalizeSearch);
-  if(fields.some(f=>f.includes(t)))return true;
-  const aliases={
-    '세럼':['세럼','serum','앰플','ampoule','에센스','essence'],
-    '앰플':['앰플','ampoule','세럼','serum','에센스','essence'],
-    '에센스':['에센스','essence','세럼','serum','앰플','ampoule'],
-    '크림':['크림','cream'],'로션':['로션','lotion'],'토너':['토너','toner'],
-    '패드':['패드','pad'],'클렌저':['클렌저','cleanser','폼','워시','wash']
-  };
-  const al=aliases[token.toLowerCase()];
-  return al ? al.some(a=>fields.some(f=>f.includes(normalizeSearch(a)))) : false;
-}
-function subsequenceMatch(product, token){
-  const t=normalizeSearch(token); if(!t||t.length<2)return false;
-  const hay=[product.goodsName,product.brand,product.standard_category,product.sub_category,product.mvp_axis].map(normalizeSearch).join(' ');
-  let i=0; for(const ch of hay){if(ch===t[i])i++;if(i===t.length)return true;} return false;
-}
-function searchScore(product,tokens){
-  const fields=[product.goodsName,product.brand,product.goodsNumber,String(product.barcode_master||''),product.barcodes_all,product.standard_category,product.sub_category,product.mvp_axis,product.customer_concerns,product.key_ingredients].map(normalizeSearch);
-  let score=0;
-  for(const token of tokens){
-    const t=normalizeSearch(token);
-    if(fields.some(f=>f===t))score+=100;
-    else if(fields.some(f=>f.includes(t)))score+=50;
-    else if(tokenMatches(product,token))score+=35;
-    else if(subsequenceMatch(product,token))score+=10;
-  }
-  return score;
+function score(p,ts){let n=0,f=fields(p);for(const t of ts){const x=normalize(t);if(f.some(v=>v===x))n+=100;else if(f.some(v=>v.includes(x)))n+=50;else if(matchToken(p,t))n+=30}return n}
+function search(q,limit=12){const ts=tokens(q);return DB.products.filter(p=>ts.every(t=>matchToken(p,t))).map(p=>({p,s:score(p,ts)})).sort((a,b)=>b.s-a.s).slice(0,limit).map(x=>x.p)}
+function show(id){['home','find','product','compare','consult'].forEach(x=>$(x).classList.toggle('hidden',x!==id));if(id==='find')$('productSearch').focus();stopScan()}
+function home(){show('home')}
+async function loadDB(){
+ const r=await fetch('./oliveyoung_DA22_runtime_db_v4.json');DB=await r.json();
+ $('dbSummary').textContent=`${DB.store} · 상품 ${DB.products.length.toLocaleString()}개 · 분석 완료 ${DB.products.filter(p=>p.verification_status==='verified').length}개`;
+ renderFilters();
 }
 function searchProducts(){
-  const raw=$('productSearch').value.trim();
-  if(!raw){$('productResults').innerHTML='<div class="empty">상품명, 브랜드 또는 바코드를 입력하세요.</div>';return}
-  const tokens=searchTokens(raw);
-  const a=DB.products.filter(p=>tokens.every(t=>tokenMatches(p,t)||subsequenceMatch(p,t))).map(p=>({p,score:searchScore(p,tokens)})).sort((a,b)=>b.score-a.score).slice(0,12).map(x=>x.p);
-  $('productResults').innerHTML=a.length?a.map(p=>`<div class="item"><button onclick="openProduct('${p.goodsNumber}')"><b>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</b><small>${esc(p.standard_category||p.sub_category||'')} · ${p.verification_status==='verified'?'분석 완료':'상품 식별만 가능'}</small></button></div>`).join(''):'<div class="empty">찾는 상품이 없습니다.</div>';
+ const q=$('productSearch').value;const a=search(q);
+ $('productResults').innerHTML=a.length?a.map(p=>`<div class="item"><button onclick="openProduct('${esc(p.goodsNumber)}')"><b>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</b><small>${esc(p.sub_category||p.standard_category||'')} · ${p.verification_status==='verified'?'✓ 분석 완료':'△ 분석 대기'} · 재고 ${p.current_stock??'-'}</small></button></div>`).join(''):'<div class="item">검색 결과가 없습니다.</div>';
 }
-function cleanName(s){return String(s).replace(/^\[[^\]]+\]\s*/,'').replace(/\s*기획.*$/,'').trim()}
-function openProduct(id){stopScan();const p=DB.products.find(x=>x.goodsNumber===id);if(!p)return;show('product');const verified=p.verification_status==='verified';const similar=DB.product_similarities.filter(x=>x.product_id===id).sort((a,b)=>b.score-a.score).slice(0,3).map(x=>DB.products.find(y=>y.goodsNumber===x.similar_product_id)).filter(Boolean);$('productDetail').innerHTML=`<div class="product-card"><div class="brand">${esc(p.brand)} · ${esc(p.standard_category||p.sub_category||'')}</div><div class="product-name">${esc(cleanName(p.goodsName))}</div><div class="tags"><span class="tag">${esc(p.mvp_axis)}</span><span class="tag ${verified?'verified':'pending'}">${verified?'✓ 분석 완료':'△ 검증 대기'}</span>${p.current_stock!==''?`<span class="tag">재고 ${esc(p.current_stock)}</span>`:''}</div>${verified?`<div class="points"><div class="point"><strong>핵심 성분</strong>${esc(p.key_ingredients)}</div><div class="point"><strong>고객에게 설명할 포인트</strong>${esc(p.selling_point_1)}</div><div class="point"><strong>한 줄 추가 포인트</strong>${esc(p.selling_point_2)}</div><div class="point"><strong>추천 고객</strong>${esc(p.customer_concerns)}</div><div class="point"><strong>제형</strong>${esc(p.texture)}</div></div>${p.caution?`<div class="caution">주의: ${esc(p.caution)}</div>`:''}`:`<div class="caution">현재 DB에서 성분·판매 포인트 검증이 완료되지 않은 상품입니다. 상품 식별만 제공하며 성분을 추정하지 않습니다.</div>`}<div class="section-title">비교하기 좋은 상품</div><div class="compare-grid">${similar.length?similar.map(s=>`<div class="compare"><h3>${esc(s.brand)} · ${esc(cleanName(s.goodsName))}</h3><p>${esc(s.key_ingredients||'성분 검증 대기')}</p><p>${esc(s.customer_concerns||s.selection_reason||'')}</p><button class="btn light" onclick="openProduct('${s.goodsNumber}')">이 상품 보기</button></div>`).join(''):'<div class="empty">아직 연결된 비교 상품이 없습니다.</div>'}</div></div>`}
-function renderConcerns(){const names=DB.concerns.map(c=>c.name);$('concernList').innerHTML=names.map(n=>`<button class="concern" data-name="${esc(n)}" onclick="this.classList.toggle('on')">${esc(n)}</button>`).join('')}
-function recommend(){const selected=[...document.querySelectorAll('.concern.on')].map(x=>x.dataset.name);if(!selected.length){$('concernResults').innerHTML='<div class="empty">고민을 1개 이상 선택하세요.</div>';return}const cmap=new Map(DB.concern_ingredients.map(x=>[x.concern_id,x]));const scores={};selected.forEach(c=>{DB.concern_ingredients.filter(x=>x.concern_id===c).forEach(x=>{scores[x.ingredient_id]=(scores[x.ingredient_id]||0)+Number(x.priority||1)})});const ing=[...Object.entries(scores)].sort((a,b)=>b[1]-a[1]).slice(0,6).map(([id,score])=>({id,score,name:(DB.ingredients.find(i=>i.id===id)||{}).name_ko||id}));const pscore={};DB.product_ingredients.forEach(pi=>{if(scores[pi.ingredient_id])pscore[pi.product_id]=(pscore[pi.product_id]||0)+scores[pi.ingredient_id]});const products=Object.entries(pscore).sort((a,b)=>b[1]-a[1]).map(x=>DB.products.find(p=>p.goodsNumber===x[0])).filter(Boolean).slice(0,6);$('concernResults').innerHTML=`<div class="section-title">우선 성분</div><div class="tags">${ing.map(i=>`<span class="tag">${esc(i.name)} · ${i.score}점</span>`).join('')}</div><div class="section-title">추천 상품</div><div class="compare-grid">${products.length?products.map(p=>`<div class="compare"><h3>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</h3><p>${esc(p.key_ingredients||'')}</p><p>${esc(p.customer_concerns||'')}</p><button class="btn" onclick="openProduct('${p.goodsNumber}')">상세 보기</button></div>`).join(''):'<div class="empty">현재 매핑된 상품이 없습니다.</div>'}</div>`}
+function openProduct(id){
+ const p=DB.products.find(x=>x.goodsNumber===id);if(!p)return;
+ show('product'); const verified=p.verification_status==='verified';
+ const sim=DB.product_similarities.filter(x=>x.product_id===id).sort((a,b)=>Number(b.score||0)-Number(a.score||0)).slice(0,4).map(x=>DB.products.find(y=>y.goodsNumber===x.similar_product_id)).filter(Boolean);
+ $('productDetail').innerHTML=`<div class="card">
+ <div class="brand">${esc(p.brand)} · ${esc(p.sub_category||p.standard_category||'')}</div>
+ <div class="name">${esc(cleanName(p.goodsName))}</div>
+ <div class="tags"><span class="tag">${esc(p.mvp_axis||p.leaf_category||'')}</span><span class="tag ${verified?'ok':'warn'}">${verified?'✓ 분석 완료':'△ 분석 대기'}</span><span class="tag">재고 ${esc(p.current_stock??'-')}</span></div>
+ ${verified?`<div class="point key"><strong>🟨 핵심 성분</strong>${esc(p.key_ingredients||'')}</div>
+ <div class="point info"><strong>🟦 직원용 한마디</strong>${esc(p.selling_point_1||'')}</div>
+ <div class="point info"><strong>🟦 추가 포인트</strong>${esc(p.selling_point_2||p.selling_point_3||'')}</div>
+ <div class="point fit"><strong>🟩 이런 고객에게</strong>${esc(p.customer_concerns||'')}</div>
+ <div class="point info"><strong>🟦 제형</strong>${esc(p.texture||'')}</div>
+ ${p.caution?`<div class="point caution"><strong>🟥 주의</strong>${esc(p.caution)}</div>`:''}`
+ :`<div class="point caution"><strong>현재 단계</strong>상품 식별만 가능합니다. 성분·효능을 추정하지 않습니다.</div>`}
+ <div class="section-title">유사 상품</div>
+ <div class="result-grid">${sim.length?sim.map(s=>`<div class="result"><h3>${esc(s.brand)} · ${esc(cleanName(s.goodsName))}</h3><p>${esc(s.key_ingredients||'분석 대기')}</p><button class="btn light" onclick="addCompare('${esc(s.goodsNumber)}')">비교에 추가</button></div>`).join(''):'<div class="tiny">현재 연결된 유사상품이 없습니다.</div>'}</div>
+ <div style="display:flex;gap:7px;margin-top:10px"><button class="btn" onclick="addCompare('${esc(p.goodsNumber)}')">⚖️ 비교에 추가</button><button class="btn light" onclick="window.open('${esc(p.source_url)}','_blank')">원문 열기</button></div>
+ </div>`;
+}
+function searchCompare(){
+ const q=$('compareSearch').value;const a=search(q,8);
+ $('compareCandidates').innerHTML=a.map(p=>`<div class="item"><button onclick="addCompare('${esc(p.goodsNumber)}')"><b>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</b><small>${p.verification_status==='verified'?'✓ 분석 완료':'△ 분석 대기'}</small></button></div>`).join('')||'<div class="item">검색 결과가 없습니다.</div>';
+}
+function addCompare(id){if(compareIds.includes(id))return;if(compareIds.length>=5){alert('비교는 최대 5개까지 가능합니다.');return}compareIds.push(id);renderCompare()}
+function removeCompare(id){compareIds=compareIds.filter(x=>x!==id);renderCompare()}
+function clearCompare(){compareIds=[];renderCompare()}
+function renderCompare(){
+ $('compareCount').textContent=`${compareIds.length}개`;
+ const ps=compareIds.map(id=>DB.products.find(p=>p.goodsNumber===id)).filter(Boolean);
+ if(!ps.length){$('compareTable').innerHTML='<div class="item tiny">상품을 검색해 추가하세요.</div>';return}
+ const rows=[['브랜드/상품',p=>`${p.brand} · ${cleanName(p.goodsName)}`],['카테고리',p=>p.sub_category||p.standard_category||'-'],['핵심 성분',p=>p.key_ingredients||'분석 대기'],['추천 고객',p=>p.customer_concerns||'분석 대기'],['제형',p=>p.texture||'분석 대기'],['직원용 포인트',p=>p.selling_point_1||'분석 대기'],['분석 상태',p=>p.verification_status==='verified'?'완료':'대기']];
+ let html='<div class="table-wrap"><table class="compare-table"><thead><tr><th>항목</th>'+ps.map(p=>`<th>${esc(p.brand)}<br>${esc(cleanName(p.goodsName))}<br><button class="btn light" onclick="removeCompare('${esc(p.goodsNumber)}')">제거</button></th>`).join('')+'</tr></thead><tbody>';
+ for(const [label,fn] of rows)html+=`<tr><th>${esc(label)}</th>${ps.map(p=>`<td>${esc(fn(p))}</td>`).join('')}</tr>`;
+ html+='</tbody></table></div>';
+ const verified=ps.filter(p=>p.verification_status==='verified');
+ let conclusion=verified.length?`${verified.map(p=>`${p.brand}는 ${p.customer_concerns||'추천 고객 정보'}에 유리`).join(' / ')}.`:'현재 선택 상품 중 분석 완료 데이터가 없어 성분 기반 결론을 만들지 않습니다.';
+ html+=`<div class="conclusion">한 줄 결론: ${esc(conclusion)}</div>`;
+ $('compareTable').innerHTML=html;
+}
+function renderFilters(){
+ const cats=['클렌징','스킨케어','선케어','베이스 메이크업','립 메이크업','아이 메이크업','블러셔'];
+ $('categoryGrid').innerHTML=cats.map(c=>`<button class="category" data-cat="${esc(c)}" onclick="this.classList.toggle('on')">${esc(c)}</button>`).join('');
+ const concerns=DB.concerns.map(x=>x.name);
+ $('concernGrid').innerHTML=concerns.map(c=>`<button class="chip" data-concern="${esc(c)}" onclick="this.classList.toggle('on')">${esc(c)}</button>`).join('');
+}
+function consult(){
+ const skin=$('skinType').value, mc=$('makeupConcern').value;
+ const cats=[...document.querySelectorAll('.category.on')].map(x=>x.dataset.cat);
+ const concerns=[...document.querySelectorAll('.chip.on')].map(x=>x.dataset.concern);
+ let qs=[...concerns];if(mc)qs.push(mc);
+ const candidates=DB.products.filter(p=>p.verification_status==='verified').filter(p=>{
+   const hay=normalize([p.main_category,p.sub_category,p.standard_category,p.customer_concerns,p.mvp_axis,p.key_ingredients,p.selling_point_1].join(' '));
+   const catOK=!cats.length||cats.some(c=>hay.includes(normalize(c).replace('메이크업','')));
+   const concernOK=!qs.length||qs.some(c=>hay.includes(normalize(c)));
+   const skinOK=!skin||normalize(p.customer_concerns).includes(normalize(skin));
+   return catOK&&(concernOK||skinOK);
+ }).slice(0,12);
+ let special='';
+ if(mc==='다크서클' && (cats.includes('스킨케어')||cats.includes('베이스 메이크업'))){
+   special='<div class="conclusion">상담 포인트: 다크서클은 <b>케어 제품 + 메이크업 커버</b>를 함께 제안할 수 있도록 구성하세요. 현재 DB에서 확인된 상품만 근거로 추천합니다.</div>';
+ }
+ $('consultResults').innerHTML=special+`<div class="section-title">추천 결과</div><div class="result-grid">${candidates.map(p=>`<div class="result"><h3>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</h3><p>${esc(p.selling_point_1||p.key_ingredients||'')}</p><p>${esc(p.customer_concerns||'')}</p><button class="btn light" onclick="openProduct('${esc(p.goodsNumber)}')">상품 보기</button></div>`).join('')||'<div class="item">현재 분석 DB에서 조건에 맞는 상품이 없습니다.</div>'}</div>`;
+}
 async function startScan(){
-  stopScan();
-  const status=$('scanStatus');
-  if(!window.isSecureContext){
-    status.innerHTML='⚠️ 카메라는 <b>HTTPS 주소</b>에서만 사용할 수 있습니다. iPhone에서 HTML 파일(file://)을 직접 연 경우 카메라가 작동하지 않습니다.';
-    return;
-  }
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    status.textContent='⚠️ 이 환경에서는 웹 카메라 기능을 사용할 수 없습니다. 아래 📸 사진으로 찾기를 이용하세요.';
-    return;
-  }
-  if(!window.ZXingBrowser){
-    status.textContent='바코드 스캐너 모듈을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.';
-    return;
-  }
-  try{
-    status.textContent='카메라를 준비하는 중…';
-    const reader=new ZXingBrowser.BrowserMultiFormatReader();
-    const controls=await reader.decodeFromConstraints(
-      {video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}},
-      $('video'),
-      (result,error)=>{
-        if(result){
-          const code=result.getText();
-          $('productSearch').value=code;
-          status.textContent='✅ 바코드 인식 완료';
-          searchProducts();
-          setTimeout(stopScan,250);
-        }
-      }
-    );
-    window.zxingControls=controls;
-    stream=$('video').srcObject||null;
-    status.textContent='📷 후면 카메라가 켜졌습니다. 바코드를 화면 가운데에 맞춰 주세요.';
-  }catch(e){
-    console.error(e);
-    const name=e?.name||'';
-    let msg='카메라를 시작하지 못했습니다.';
-    if(name==='NotAllowedError')msg='⚠️ 카메라 접근이 차단되었습니다. Safari의 사이트별 카메라 권한이 허용인지 확인해 주세요.';
-    else if(name==='NotFoundError')msg='⚠️ 사용할 수 있는 카메라를 찾지 못했습니다.';
-    else if(name==='SecurityError')msg='⚠️ 보안 문제로 카메라를 사용할 수 없습니다. HTTPS 주소인지 확인해 주세요.';
-    else if(name==='NotReadableError')msg='⚠️ 카메라가 다른 앱에서 사용 중일 수 있습니다. 카메라를 사용하는 앱을 닫고 다시 시도해 주세요.';
-    status.textContent=msg;
-  }
+ stopScan();
+ if(!window.ZXing){$('scanStatus').textContent='바코드 모듈을 불러오지 못했습니다.';return}
+ if(!window.isSecureContext){$('scanStatus').textContent='카메라는 HTTPS에서만 사용할 수 있습니다. 홈 화면 웹앱도 HTTPS 주소로 설치하세요.';return}
+ try{
+   const reader=new ZXing.BrowserMultiFormatReader();
+   scanControls=await reader.decodeFromConstraints({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}},$('video'),(result,error)=>{
+     if(result){const code=result.getText();$('scanStatus').textContent=`인식: ${code}`;stopScan();const p=DB.products.find(x=>String(x.barcode_master)===String(code)||String(x.barcodes_all||'').split(' ').includes(String(code)));if(p)openProduct(p.goodsNumber);else{$('productSearch').value=code;searchProducts()}}
+   });
+   $('scanStatus').textContent='바코드를 화면 중앙에 맞춰주세요.';
+ }catch(e){$('scanStatus').textContent=`카메라 오류: ${e.name||e.message}`;}
 }
-async function scanPhoto(file){
-  if(!file)return;
-  const status=$('scanStatus'); status.textContent='사진에서 바코드를 찾는 중…';
-  try{
-    if(!window.ZXingBrowser)throw new Error('ZXing unavailable');
-    const reader=new ZXingBrowser.BrowserMultiFormatReader();
-    const url=URL.createObjectURL(file);
-    try{
-      const result=await reader.decodeFromImageUrl(url);
-      const code=result.getText();
-      $('productSearch').value=code;
-      status.textContent='✅ 사진에서 바코드 인식 완료';
-      searchProducts();
-    }finally{URL.revokeObjectURL(url)}
-  }catch(e){
-    status.textContent='사진에서 바코드를 찾지 못했습니다. 현재는 아래 검색창을 이용해 주세요.';
-  }
-}
-function stopScan(){
-  if(window.zxingControls){try{window.zxingControls.stop()}catch(e){}window.zxingControls=null}
-  if(scanTimer)cancelAnimationFrame(scanTimer);
-  scanTimer=null;
-  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
-  if($('video').srcObject){try{$('video').srcObject.getTracks().forEach(t=>t.stop())}catch(e){}}
-  $('video').srcObject=null;
-}
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-loadDB().catch(()=>{$('sourceNote').textContent='DB 로드 실패'});
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
-</script></body></html>
+function stopScan(){try{if(scanControls&&scanControls.stop)scanControls.stop()}catch{}scanControls=null;if($('video')?.srcObject){$('video').srcObject.getTracks().forEach(t=>t.stop());$('video').srcObject=null}}
+async function scanPhoto(file){if(!file)return;$('scanStatus').textContent='사진에서 바코드를 찾는 중…';try{const r=new ZXing.BrowserMultiFormatReader();const url=URL.createObjectURL(file);const result=await r.decodeFromImageUrl(url);URL.revokeObjectURL(url);const code=result.getText();$('scanStatus').textContent=`인식: ${code}`;const p=DB.products.find(x=>String(x.barcode_master)===String(code)||String(x.barcodes_all||'').split(' ').includes(String(code)));if(p)openProduct(p.goodsNumber);else{$('productSearch').value=code;searchProducts()}}catch(e){$('scanStatus').textContent='사진에서 바코드를 찾지 못했습니다. 상품명을 검색해 주세요.'}}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+loadDB().catch(e=>$('dbSummary').textContent='DB 로드 실패: '+e.message);
+</script>
+</body></html>
