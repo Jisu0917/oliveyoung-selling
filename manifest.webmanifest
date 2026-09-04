@@ -1,9 +1,10 @@
 {
   "name":"올영 직원 도우미 · 장승배기역점",
-  "short_name":"올영도우미",
-  "start_url":"./",
+  "short_name":"올영 직원도우미",
+  "start_url":"./index.html",
   "display":"standalone",
   "background_color":"#f6f6f6",
   "theme_color":"#111111",
-  "lang":"ko"
+  "lang":"ko",
+  "icons":[]
 }
