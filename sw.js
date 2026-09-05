@@ -1,4 +1,4 @@
-const CACHE='oy-da22-v18';
+const CACHE='oy-da22-v19';
 const CORE=[
   './','./index.html','./manifest.webmanifest','./config.js','./db.json',
   './fonts/Mallang-Galmuri11-R.ttf',
@@ -10,7 +10,7 @@ self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promis
 self.addEventListener('fetch',e=>{
   const u=new URL(e.request.url);
   if(u.origin!==location.origin)return;
-  if(u.pathname.endsWith('/config.js')||u.pathname.endsWith('/db.json')){
+  if(u.pathname.endsWith('/config.js')||u.pathname.endsWith('/db.json')||u.pathname.endsWith('/index.html')||u.pathname==='/' ){
     e.respondWith(fetch(e.request,{cache:'no-store'}).catch(()=>caches.match(e.request)));
     return;
   }

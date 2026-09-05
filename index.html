@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#ffd2dc"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="올영 판매 도우미"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"><link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
-<title>올영 판매 도우미 · DA22 v11</title>
+<title>올영 셀링 헬퍼 · DA22 v19</title>
 <style>
 @font-face{font-family:MallangGalmuri;src:url('./fonts/Mallang-Galmuri11-R.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
 :root{--bg:#fff7fa;--card:#fff;--text:#4a3940;--muted:#987f88;--line:#f1ccd7;--pink:#ff91ad;--pink2:#ffd4df;--pink3:#fff0f4;--deep:#d95779;--green:#2e8a5b;--greenbg:#eaf8f0;--red:#c64f63;--redbg:#fff0f3;--amber:#a97818;--amberbg:#fff8df;--shadow:0 5px 18px rgba(193,93,120,.10)}
@@ -99,7 +99,14 @@ async function searchGlobal(q){
     if(old) Object.assign(old,rp);
     else DB.products.push({...rp,analysis_status:'pending',current_stock:Number.isFinite(Number(rp.current_stock))?Number(rp.current_stock):0});
   }
-  return json.products;
+  // API 응답이 검색어와 어긋날 수 있어, 화면에는 상품명/브랜드에
+  // 모든 검색어 토큰이 실제로 포함된 결과를 우선 사용한다.
+  const ts=tokenize(q);
+  const strict=json.products.filter(p=>{
+    const h=norm([p.goodsName,p.brand].join(' '));
+    return ts.every(t=>h.includes(norm(t)));
+  });
+  return strict.length?strict:search(q);
 }
 function groupKey(p){return String(p.masterGoodsNumber||p.master_goods_number||p.goodsNumber||'')}
 function variantLabel(p){
@@ -157,12 +164,18 @@ function openProduct(id){
 }
 async function checkOptionStocks(id){
   const p=DB.products.find(x=>String(x.goodsNumber)===String(id));const out=$(`options-${id}`);if(!p||!out)return;
-  const codes=Array.isArray(p.barcodes_all)?p.barcodes_all:[];if(!codes.length){out.innerHTML='<div class="notice" style="margin-top:8px">옵션 바코드 정보를 찾지 못했습니다.</div>';return}
-  out.innerHTML='<div class="notice" style="margin-top:8px">옵션별 현재 재고를 조회하는 중…</div>';
+  const codes=Array.isArray(p.barcodes_all)?p.barcodes_all:[];if(!codes.length){out.innerHTML='<div class="notice" style="margin-top:8px">옵션 식별 정보가 없습니다.</div>';return}
+  out.innerHTML='<div class="notice" style="margin-top:8px">옵션별 현재 재고와 옵션명을 확인하는 중…</div>';
   try{
     const base=String(window.OY_CONFIG?.STOCK_PROXY_URL||'').replace(/\/api\/stock\/?$/,'');if(!base)throw new Error('STOCK_PROXY_URL 없음');
     const res=await fetch(base+'/api/option-stock?goodsNumber='+encodeURIComponent(id)+'&barcodes='+encodeURIComponent(codes.join(',')),{cache:'no-store'});const j=await res.json();if(!res.ok||!j.ok)throw new Error(j.message||'옵션 재고 조회 실패');
-    out.innerHTML=`<div class="option-list">${j.options.map((o,i)=>{const q=Number(o.quantity);const handled=o.storeHandling;const tag=handled===true?(q>0?`<span class="tag stock-ok">🟢 취급 / 재고 ${q}개</span>`:`<span class="tag stock-zero">🔴 취급 / 품절</span>`):handled===false?(q>0?`<span class="tag stock-unknown">🟡 미취급 / 재고 ${q}개</span>`:`<span class="tag stock-zero">⚪ 미취급 / 품절</span>`):'<span class="tag stock-unknown">취급 여부 미확인</span>';return `<div class="option-row"><div class="option-name">옵션 ${i+1}</div><div class="option-meta">바코드 ${esc(o.barcode||'')}</div><div class="tags" style="margin-top:5px">${tag}</div></div>`}).join('')}</div>`;
+    out.innerHTML=`<div class="option-list">${j.options.map((o,i)=>{
+      const q=Number(o.quantity),handled=o.storeHandling;
+      const tag=handled===true?(q>0?`<span class="tag stock-ok">🟢 취급 / 재고 ${q}개</span>`:`<span class="tag stock-zero">🔴 취급 / 품절</span>`):handled===false?(q>0?`<span class="tag stock-unknown">🟡 미취급 / 재고 ${q}개</span>`:`<span class="tag stock-zero">⚪ 미취급 / 품절</span>`):`<span class="tag stock-unknown">재고/취급 확인 필요</span>`;
+      const name=String(o.optionName||'').trim()||'';
+      const fallback=String(o.goodsName||'').trim();
+      return `<div class="option-row"><div class="option-name">${name?`🎨 ${esc(name)}`:`🎨 옵션 ${i+1}`}</div>${!name&&fallback?`<div class="option-meta">올리브영 응답 상품명: ${esc(fallback)}</div>`:''}<div class="option-meta">바코드 ${esc(o.barcode||'')}</div><div class="tags" style="margin-top:5px">${tag}</div>${!name?`<div class="option-meta" style="margin-top:5px">※ 올리브영 재고 API에서 옵션명이 제공되지 않은 경우입니다.</div>`:''}</div>`;
+    }).join('')}</div>`;
   }catch(e){out.innerHTML=`<div class="notice" style="margin-top:8px">옵션별 재고 조회에 실패했습니다.<br><span class="note">${esc(e.message||'서버 응답 오류')}</span></div>`}
 }
 function selectSubTarget(id){const p=DB.products.find(x=>x.goodsNumber===id);if(!p)return;$('subResults').innerHTML='';$('subTarget').innerHTML=`<div class="section-title">선택한 상품</div><div class="card"><b>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</b><div class="tags" style="margin-top:7px">${stockTag(p)}<span class="tag">${esc(p.standard_category||p.sub_category||'')}</span></div><div style="margin-top:9px"><button class="btn small" onclick="checkLiveStock('${esc(id)}','subLive')">⚡ 이 상품 재고 다시 확인</button><div id="subLive" class="live-status"></div></div></div>`;renderSubstitutes(p)}
