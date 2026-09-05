@@ -21,7 +21,7 @@
  <div class="section-title">상품 빠른 검색</div>
  <div class="search"><input id="homeQ" placeholder="상품명 · 브랜드 · 성분 · 바코드"><button class="btn search-action" onclick="quickSearch()"><img src="./icons/search_on.png" alt="">검색</button></div>
  <div id="homeResults" class="list" style="margin-top:9px"></div>
- <div class="section-title">현재 데이터</div><div class="card data-card"><img class="mini-sticker" src="./icons/sticker_sleep.png" alt="잠자는 토끼"><div><b id="dataSummary">로딩 중...</b><div class="note" style="margin-top:6px">상품 마스터 4,782개 · 검증된 상담 분석 50개. 상세 분석이 없는 상품은 성분을 추정하지 않습니다.</div></div></div>
+ <div class="section-title">현재 데이터</div><div class="card data-card"><img class="mini-sticker" src="./icons/sticker_sleep.png" alt="잠자는 토끼"><div><b id="dataSummary">로딩 중...</b><div class="note" style="margin-top:6px">매장 재고 DB 4,782개 · 검색 시 올리브영 전체 상품도 조회합니다. 상세 분석이 없는 상품은 성분을 추정하지 않습니다.</div></div></div>
 </section>
 <section id="substitute" class="screen hidden"><button class="back" onclick="home()">← 홈</button><div class="section-title">🔄 대체 상품 찾기</div><div class="notice"><b>사용 상황</b><br>“손님이 원하는 상품이 없어요. 대신 우리 매장에 있는 비슷한 제품을 찾아주세요.”</div><div class="search" style="margin-top:10px"><input id="subQ" placeholder="예: 메디힐 패드 / 디오디너리 나이아신아마이드"><button class="btn" onclick="searchProducts('subQ','subResults',true)">검색</button></div><div class="note" style="margin:7px 0">검색어의 <b>각 단어가 모두 포함된 상품</b>을 우선 보여줍니다. 단어 사이에 다른 단어가 있어도 검색됩니다.</div><div id="subResults" class="list"></div><div class="compare-bar" style="position:sticky;bottom:84px;z-index:15;box-shadow:0 4px 14px rgba(193,93,120,.12)"><span><b class="compare-count">0</b>개 선택 · 최대 5개</span><button class="btn compare-btn" onclick="showCompare()">선택 상품 비교</button></div><div class="compare-results"></div><div id="subTarget"></div><div id="subCandidates"></div></section>
 <section id="find" class="screen hidden"><button class="back" onclick="home()">← 홈</button><div class="section-title">🔎 상품 찾기</div><div class="camera-box"><video id="barcodeVideo" playsinline muted></video><div class="camera-actions"><button class="btn small" onclick="startBarcodeScan()">📷 바코드 스캔</button><button class="btn light small" onclick="stopBarcodeScan()">카메라 끄기</button></div><div id="barcodeStatus" class="note" style="margin-top:7px">바코드를 비추면 상품을 자동으로 검색합니다.</div></div><div class="search"><input id="findQ" placeholder="상품명 · 브랜드 · 성분 · 바코드"><button class="btn" onclick="searchProducts('findQ','findResults',false)">검색</button></div><div class="note" style="margin:7px 0">예: “메디힐 패드” → 메디힐의 패드 제품을 함께 검색합니다.</div><div id="findResults" class="list"></div><div class="compare-bar" style="position:sticky;bottom:84px;z-index:15;box-shadow:0 4px 14px rgba(193,93,120,.12)"><span><b class="compare-count">0</b>개 선택 · 최대 5개</span><button class="btn compare-btn" onclick="showCompare()">선택 상품 비교</button></div><div class="compare-results"></div></section>
@@ -68,10 +68,47 @@ async function updateApp(){
     setTimeout(()=>location.reload(),700);
   }
 }
-function stockTag(p){const q=Number(p.current_stock);if(Number.isFinite(q))return q>0?`<span class="tag stock-ok">🟢 재고 ${q}개</span>`:`<span class="tag stock-zero">🔴 재고 0</span>`;return `<span class="tag stock-unknown">재고 미확인</span>`}
+function stockTag(p){
+  const q=Number(p.current_stock);
+  const handled=p.store_handling;
+  if(handled===true){
+    return Number.isFinite(q)&&q>0
+      ? `<span class="tag stock-ok">🟢 취급 / 재고 ${q}개</span>`
+      : `<span class="tag stock-zero">🔴 취급 / 품절</span>`;
+  }
+  if(handled===false){
+    return Number.isFinite(q)&&q>0
+      ? `<span class="tag stock-unknown">🟡 미취급 / 재고 ${q}개</span>`
+      : `<span class="tag stock-zero">⚪ 미취급 / 품절</span>`;
+  }
+  if(Number.isFinite(q)) return q>0?`<span class="tag stock-ok">🟢 재고 ${q}개</span>`:`<span class="tag stock-zero">🔴 재고 0</span>`;
+  return `<span class="tag stock-unknown">재고 미확인</span>`;
+}
 function tokenize(q){return String(q||'').trim().toLowerCase().normalize('NFKC').split(/\s+/).map(x=>x.replace(/[^0-9a-z가-힣]+/g,'')).filter(Boolean)}
-function search(q){const ts=tokenize(q);if(!ts.length)return[];const rows=DB.products.map(p=>{const h=hay(p);const hits=ts.filter(t=>h.includes(norm(t))).length;const exactName=ts.filter(t=>norm(p.goodsName).includes(norm(t))).length;const exactBrand=ts.filter(t=>norm(p.brand).includes(norm(t))).length;return{p,hits,score:hits*100+exactName*15+exactBrand*12}});const full=rows.filter(x=>x.hits===ts.length).sort((a,b)=>b.score-a.score);if(full.length)return full.map(x=>x.p);return rows.filter(x=>x.hits>0).sort((a,b)=>b.score-a.score).map(x=>x.p)}
-function searchProducts(inputId,resultId,isSub){const q=$(inputId).value;const a=search(q);$(resultId).innerHTML=a.length?a.map(p=>`<div class="item"><div style="display:flex;gap:8px;align-items:flex-start"><input class="compare-check" type="checkbox" ${compareSet.has(p.goodsNumber)?'checked':''} onchange="toggleCompare('${esc(p.goodsNumber)}',this.checked,this)" aria-label="비교 선택"><button onclick="${isSub?`selectSubTarget('${esc(p.goodsNumber)}')`:`openProduct('${esc(p.goodsNumber)}')`}"><b>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</b><small>${esc(p.standard_category||p.sub_category||'')} · ${stockTag(p)} · ${p.analysis_status==='verified'?'✓ 분석 완료':'△ 분석 대기'}</small></button></div></div>`).join(''):'<div class="empty">모든 검색어가 포함된 상품을 찾지 못했습니다.</div>';updateCompareCount()}
+function search(q){const ts=tokenize(q);if(!ts.length)return[];const rows=DB.products.map(p=>{const nameBrand=norm([p.goodsName,p.brand].join(' '));const broad=hay(p);const nameHits=ts.filter(t=>nameBrand.includes(norm(t))).length;const broadHits=ts.filter(t=>broad.includes(norm(t))).length;const exactName=ts.filter(t=>norm(p.goodsName).includes(norm(t))).length;const exactBrand=ts.filter(t=>norm(p.brand).includes(norm(t))).length;return{p,nameHits,broadHits,score:nameHits*100+broadHits*5+exactName*15+exactBrand*12}});const strict=rows.filter(x=>x.nameHits===ts.length).sort((a,b)=>b.score-a.score);if(strict.length)return strict.map(x=>x.p);const broad=rows.filter(x=>x.broadHits===ts.length).sort((a,b)=>b.score-a.score);if(broad.length)return broad.map(x=>x.p);return rows.filter(x=>x.broadHits>0).sort((a,b)=>b.score-a.score).map(x=>x.p)}
+async function searchGlobal(q){
+  const base=String(window.OY_CONFIG?.STOCK_PROXY_URL||'').replace(/\/api\/stock\/?$/,'');
+  if(!base) return search(q);
+  const endpoint=base+'/api/catalog-search';
+  const res=await fetch(endpoint+'?keyword='+encodeURIComponent(q),{cache:'no-store'});
+  if(!res.ok) throw new Error('CATALOG_SEARCH_HTTP_'+res.status);
+  const json=await res.json();
+  if(!json.ok||!Array.isArray(json.products)) throw new Error(json.message||'CATALOG_SEARCH_FAILED');
+  for(const rp of json.products){
+    const old=DB.products.find(p=>String(p.goodsNumber)===String(rp.goodsNumber));
+    if(old) Object.assign(old,rp);
+    else DB.products.push({...rp,analysis_status:'pending',current_stock:Number.isFinite(Number(rp.current_stock))?Number(rp.current_stock):0});
+  }
+  return json.products;
+}
+async function searchProducts(inputId,resultId,isSub){
+  const q=$(inputId).value.trim();
+  if(!q){$(resultId).innerHTML='<div class="empty">검색어를 입력하세요.</div>';return}
+  let a=[];
+  try{a=await searchGlobal(q);}catch(e){a=search(q)}
+  $(resultId).innerHTML=a.length?a.map(p=>`<div class="item"><div style="display:flex;gap:8px;align-items:flex-start"><input class="compare-check" type="checkbox" ${compareSet.has(p.goodsNumber)?'checked':''} onchange="toggleCompare('${esc(p.goodsNumber)}',this.checked,this)" aria-label="비교 선택"><button onclick="${isSub?`selectSubTarget('${esc(p.goodsNumber)}')`:`openProduct('${esc(p.goodsNumber)}')`}"><b>${esc(p.brand||'')} · ${esc(cleanName(p.goodsName))}</b><small>${esc(p.standard_category||p.sub_category||'')} · ${stockTag(p)} · ${p.analysis_status==='verified'?'✓ 분석 완료':'△ 분석 대기'}</small></button></div></div>`).join(''):'<div class="empty">모든 검색어가 포함된 상품을 찾지 못했습니다.</div>';
+  updateCompareCount();
+}
 function quickSearch(){const q=$('homeQ').value.trim();if(!q)return;show('find');$('findQ').value=q;searchProducts('findQ','findResults',false)}
 const compareSet=new Set();
 function toggleCompare(id,on,el){if(on){if(compareSet.size>=5){alert('상품 비교는 최대 5개까지 가능합니다.');if(el)el.checked=false;return}compareSet.add(id)}else compareSet.delete(id);updateCompareCount()}
@@ -115,6 +152,7 @@ async function checkLiveStock(id,targetId){
       :`재고 수량을 확인하지 못했습니다 · ${checkedText}`;
     if(Number.isFinite(q))p.current_stock=q;
     if(json.stockStatus)p.stockStatus=json.stockStatus;
+    if(typeof json.storeHandling==='boolean')p.store_handling=json.storeHandling;
     p.stock_checked_at=checked.toISOString();
   }catch(e){
     out.className='live-status notice';
@@ -126,8 +164,17 @@ async function checkLiveStock(id,targetId){
     if(btn)btn.disabled=false;
   }
 }
-let barcodeStream=null,barcodeReader=null,barcodeScanning=false;
-async function loadZXing(){if(window.ZXingBrowser||window.ZXing)return window.ZXingBrowser||window.ZXing;await new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js';sc.onload=resolve;sc.onerror=reject;document.head.appendChild(sc)});return window.ZXingBrowser||window.ZXing}
+let barcodeStream=null,barcodeReader=null,barcodeControls=null,barcodeScanning=false;
+async function loadZXing(){
+  if(window.ZXingBrowser||window.ZXing)return window.ZXingBrowser||window.ZXing;
+  await new Promise((resolve,reject)=>{
+    const sc=document.createElement('script');
+    sc.src='https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js';
+    sc.onload=resolve;sc.onerror=()=>reject(new Error('ZXING_LOAD_FAILED'));
+    document.head.appendChild(sc)
+  });
+  return window.ZXingBrowser||window.ZXing
+}
 async function startBarcodeScan(){
   stopBarcodeScan();
   const video=$('barcodeVideo'),status=$('barcodeStatus');if(!video)return;
@@ -137,34 +184,61 @@ async function startBarcodeScan(){
     const ZX=await loadZXing();
     const Reader=ZX?.BrowserMultiFormatReader;
     if(!Reader)throw new Error('ZXING_LOAD_FAILED');
+
     const reader=new Reader();
-    barcodeReader=reader;barcodeScanning=true;
+    barcodeReader=reader;
+    barcodeScanning=true;
     status.textContent='카메라를 켜는 중…';
-    const controls=await reader.decodeFromConstraints({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false},video,(result,error)=>{
+
+    // ZXing이 카메라 스트림 전체를 관리하도록 한다.
+    // iPhone Safari에서는 decodeFromConstraints보다 decodeFromVideoDevice가 더 안정적이다.
+    let deviceId='';
+    try{
+      const devices=await reader.listVideoInputDevices();
+      const back=devices.find(d=>/back|rear|environment|후면|후방/i.test(d.label||''));
+      deviceId=back?.deviceId||devices[devices.length-1]?.deviceId||'';
+    }catch(e){/* 자동 카메라 선택으로 계속 */}
+
+    const controls=await reader.decodeFromVideoDevice(deviceId,video,(result,error)=>{
       if(!barcodeScanning)return;
       if(result){
-        const value=result.getText();
+        const value=result.getText().trim();
+        if(!value)return;
         status.textContent=`인식 완료: ${value}`;
-        stopBarcodeScan();
+        barcodeScanning=false;
+        try{controls?.stop?.()}catch(e){}
+        barcodeControls=null;
+        try{reader.reset?.()}catch(e){}
+        barcodeReader=null;
         $('findQ').value=value;
         searchProducts('findQ','findResults',false);
       }
     });
+
     if(!barcodeScanning){try{controls?.stop?.()}catch(e){}return}
     barcodeControls=controls;
-    status.textContent='바코드를 화면 안에 맞춰주세요.';
+    status.textContent='📷 카메라가 켜졌습니다. 바코드를 화면 안에 맞춰주세요.';
   }catch(e){
     console.error('Barcode scan error:',e);
     let msg='바코드 스캔을 시작하지 못했습니다.';
-    if(e?.name==='NotAllowedError')msg='카메라 권한이 필요합니다. iPhone 설정에서 Safari의 카메라 접근을 허용해주세요.';
+    if(e?.name==='NotAllowedError')msg='카메라 권한이 필요합니다. iPhone 설정에서 이 사이트의 카메라 접근을 허용해주세요.';
     else if(e?.name==='NotFoundError')msg='사용 가능한 카메라를 찾지 못했습니다.';
     else if(e?.message==='ZXING_LOAD_FAILED')msg='바코드 스캐너를 불러오지 못했습니다. 인터넷 연결을 확인해주세요.';
     else if(e?.message==='MEDIA_UNSUPPORTED')msg='현재 브라우저에서는 카메라 기능을 사용할 수 없습니다.';
     else msg+=' 다시 눌러주세요.';
-    status.textContent=msg;stopBarcodeScan();
+    status.textContent=msg;
+    stopBarcodeScan();
   }
 }
-function stopBarcodeScan(){barcodeScanning=false;try{barcodeControls?.stop?.()}catch(e){}barcodeControls=null;try{barcodeReader?.reset?.()}catch(e){}barcodeReader=null;if(barcodeStream){barcodeStream.getTracks().forEach(t=>t.stop());barcodeStream=null}const video=$('barcodeVideo');if(video)video.srcObject=null}
+function stopBarcodeScan(){
+  barcodeScanning=false;
+  try{barcodeControls?.stop?.()}catch(e){}
+  barcodeControls=null;
+  try{barcodeReader?.reset?.()}catch(e){}
+  barcodeReader=null;
+  if(barcodeStream){barcodeStream.getTracks().forEach(t=>t.stop());barcodeStream=null}
+  const video=$('barcodeVideo');if(video)video.srcObject=null
+}
 function renderChips(id,items){$(id).innerHTML=items.map(x=>`<button class="chip" data-v="${esc(x)}" onclick="this.classList.toggle('on')">${esc(x)}</button>`).join('')}
 function renderCats(id,items){$(id).innerHTML=items.map(x=>`<button class="category" data-v="${esc(x)}" onclick="this.classList.toggle('on')">${esc(x)}</button>`).join('')}
 function selected(id){return[...document.querySelectorAll('#'+id+' .on')].map(x=>x.dataset.v)}
