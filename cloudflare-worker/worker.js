@@ -237,29 +237,53 @@ export default {
       const barcodes=String(url.searchParams.get('barcodes')||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,30);
       if(!goodsNumber||!barcodes.length) return json({ok:false,message:'goodsNumber와 barcodes가 필요합니다.'},400);
       try{
-        const options=await Promise.all(barcodes.map(async barcode=>{
-          try{
-            const data=await callUpstream(OY_STOCK_URL,{size:20,dispCatNo:'',page:1,keyword:barcode,sort:'01',strNo:STORE_CODE,includeSoldOut:true});
-            const list=listFrom(data);
-            const match=list.find(x=>sameProduct(x,goodsNumber,barcode));
-            if(match){
-              const q=quantityOf(match);
-              return {barcode, optionName:optionNameOf(match), goodsName:String(match.goodsName||''), quantity:Number.isFinite(q)?q:null, storeHandling:handlingOf(match), stockStatus:String(match.stockStatus||'').toLowerCase()||((Number.isFinite(q)&&q>0)?'in_stock':'out_of_stock')};
+        // 옵션별 조회는 '바코드 검색' 하나에 의존하지 않는다.
+        // 1) 상품번호로 매장 재고 API를 조회하고
+        // 2) 상품번호/바코드로 search-v3도 보조 조회한 뒤
+        // 3) 실제 옵션 바코드와 정확히 매칭되는 행만 사용한다.
+        const base={size:50,dispCatNo:'',page:1,sort:'01',strNo:STORE_CODE,includeSoldOut:true};
+        const collected=[];
+        const pushList=(data)=>{const list=listFrom(data);for(const x of list)if(x)collected.push(x)};
+        const productQueries=[
+          [OY_STOCK_URL,{...base,keyword:goodsNumber}],
+          [OY_SEARCH_URL,{...base,keyword:goodsNumber}],
+          [OY_SEARCH_URL,{size:50,dispCatNo:'',page:1,sort:'01',includeSoldOut:true,keyword:goodsNumber}]
+        ];
+        for(const [endpoint,body] of productQueries){try{pushList(await callUpstream(endpoint,body))}catch{}}
+        // 바코드별 조회는 실패한 옵션만 보강한다. 호출 수를 제한해 매장 검색을 과도하게 만들지 않는다.
+        const results=[];
+        for(const barcode of barcodes){
+          let match=collected.find(x=>sameProduct(x,goodsNumber,barcode));
+          if(!match){
+            const barcodeQueries=[
+              [OY_STOCK_URL,{...base,keyword:barcode}],
+              [OY_SEARCH_URL,{...base,keyword:barcode}],
+              [OY_SEARCH_URL,{size:20,dispCatNo:'',page:1,sort:'01',includeSoldOut:true,keyword:barcode}]
+            ];
+            for(const [endpoint,body] of barcodeQueries){
+              try{
+                const data=await callUpstream(endpoint,body);pushList(data);
+                const list=listFrom(data);match=list.find(x=>sameProduct(x,goodsNumber,barcode));
+                if(match)break;
+              }catch{}
             }
-            // 바코드 검색 결과가 옵션 행으로 직접 내려오지 않는 경우,
-            // 같은 barcode를 itemNumbers로 가진 응답을 한 번 더 탐색한다.
-            const loose=list.find(x=>{
-              const vals=[x?.itemNumbers,x?.barcodes,x?.barcode,x?.itemNumber].flatMap(v=>Array.isArray(v)?v.map(String):String(v??'').split(/[|,\s]+/));
-              return vals.includes(String(barcode));
-            });
-            if(loose){
-              const q=quantityOf(loose);
-              return {barcode, optionName:optionNameOf(loose), goodsName:String(loose.goodsName||''), quantity:Number.isFinite(q)?q:null, storeHandling:handlingOf(loose), stockStatus:String(loose.stockStatus||'').toLowerCase()||((Number.isFinite(q)&&q>0)?'in_stock':'out_of_stock')};
-            }
-            return {barcode,optionName:'',goodsName:'',quantity:null,storeHandling:null,stockStatus:'unknown'};
-          }catch{return {barcode,optionName:'',goodsName:'',quantity:null,storeHandling:null,stockStatus:'unknown'}}
-        }));
-        return json({ok:true,goodsNumber,options,checkedAt:new Date().toISOString(),source:'oliveyoung'});
+          }
+          if(!match){
+            results.push({barcode,optionName:'',goodsName:'',quantity:null,storeHandling:null,stockStatus:'unknown',found:false});
+            continue;
+          }
+          const q=quantityOf(match);
+          results.push({
+            barcode,
+            optionName:optionNameOf(match),
+            goodsName:String(match.goodsName||''),
+            quantity:Number.isFinite(q)?q:null,
+            storeHandling:handlingOf(match),
+            stockStatus:String(match.stockStatus||'').toLowerCase()||((Number.isFinite(q)&&q>0)?'in_stock':'out_of_stock'),
+            found:true
+          });
+        }
+        return json({ok:true,goodsNumber,options:results,checkedAt:new Date().toISOString(),source:'oliveyoung'});
       }catch(e){return json({ok:false,message:e?.message||'옵션 재고 조회 실패'},502)}
     }
 
