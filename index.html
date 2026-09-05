@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#ffd2dc"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="올영 셀링 헬퍼"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"><link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
-<title>올영 셀링 헬퍼 · DA22 v22</title>
+<title>올영 셀링 헬퍼 · DA22 v23</title>
 <style>
 @font-face{font-family:MallangGalmuri;src:url('./fonts/Mallang-Galmuri11-R.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
 :root{--bg:#fff7fa;--card:#fff;--text:#4a3940;--muted:#987f88;--line:#f1ccd7;--pink:#ff91ad;--pink2:#ffd4df;--pink3:#fff0f4;--deep:#d95779;--green:#2e8a5b;--greenbg:#eaf8f0;--red:#c64f63;--redbg:#fff0f3;--amber:#a97818;--amberbg:#fff8df;--shadow:0 5px 18px rgba(193,93,120,.10)}
@@ -28,7 +28,7 @@
 <section id="product" class="screen hidden"><button class="back" onclick="show('find')">← 상품 찾기</button><div id="productDetail"></div></section>
 <section id="skin" class="screen hidden"><button class="back" onclick="home()">← 홈</button><div class="section-title">🧴 스킨케어 · 클렌징 카운슬링</div><div class="field"><label>피부 타입</label><select id="skinType" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff"><option value="">선택 안 함</option><option>건성</option><option>중성</option><option>지성</option><option>복합성</option><option>민감성</option><option>수부지</option></select></div><div class="field"><label>피부 고민 (복수 선택)</label><div id="skinConcernGrid" class="chips"></div></div><div class="field"><label>제품 카테고리</label><div id="skinCatGrid" class="category-grid"></div></div><button class="btn full" onclick="runSkinConsult()">추천 상품 보기</button><div id="skinResults"></div></section>
 <section id="makeup" class="screen hidden"><button class="back" onclick="home()">← 홈</button><div class="section-title">💄 메이크업 카운슬링</div><div class="field"><label>피부 타입</label><select id="makeupSkin" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff"><option value="">선택 안 함</option><option>건성</option><option>중성</option><option>지성</option><option>복합성</option></select></div><div class="field"><label>퍼스널컬러</label><select id="personalColor" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff"><option value="">선택 안 함</option><option>봄 웜</option><option>여름 쿨</option><option>가을 웜</option><option>겨울 쿨</option></select></div><div class="field"><label>세부 톤</label><div id="muToneGrid" class="chips"></div></div><div class="field"><label>제품 카테고리</label><div id="muCatGrid" class="category-grid"></div></div><div class="field"><label>메이크업 고민 / 원하는 표현</label><div id="makeupConcernGrid" class="chips"></div></div><button class="btn full" onclick="runMakeupConsult()">추천 상품 보기</button><div id="makeupResults"></div></section>
-<footer class="foot"><div>직원 판매 보조용입니다. 성분·효과를 의학적 진단이나 치료로 표현하지 않습니다. 재고는 조회 시점 데이터이며 실제 판매 가능 수량과 차이가 날 수 있습니다.</div><div id="updateStatus" style="margin-top:7px"></div><div id="appVersion" class="app-version">현재 버전 v22</div></footer>
+<footer class="foot"><div>직원 판매 보조용입니다. 성분·효과를 의학적 진단이나 치료로 표현하지 않습니다. 재고는 조회 시점 데이터이며 실제 판매 가능 수량과 차이가 날 수 있습니다.</div><div id="updateStatus" style="margin-top:7px"></div><div id="appVersion" class="app-version">현재 버전 v23</div></footer>
 <nav class="bottom-nav" aria-label="주요 메뉴">
 <button id="tab-home" class="tab on" onclick="show('home')"><span class="tab-icon"><img data-off="./icons/sticker_heart.png" data-on="./icons/sticker_wave.png" src="./icons/sticker_wave.png" alt=""></span>홈</button>
 <button id="tab-substitute" class="tab" onclick="show('substitute')"><span class="tab-icon"><img data-off="./icons/products_off.png" data-on="./icons/products_on.png" src="./icons/products_off.png" alt=""></span>대체상품</button>
@@ -39,7 +39,7 @@
 <script src="./config.js"></script>
 <script>
 let DB={products:[],ingredients:[],concerns:[],product_ingredients:[],concern_ingredients:[],product_similarities:[]};
-const APP_VERSION='v22';
+const APP_VERSION='v23';
 let versionPressTimer=null;
 function startVersionPress(e){
   if(e) e.preventDefault();
@@ -209,14 +209,34 @@ function openProduct(id){
 function inferOptionNames(product,count){
   const raw=String(product?.goodsName||'');
   const candidates=[];
-  const parenRe=/\(([^()]{2,160})\)/g;
+  const pushParts=(body)=>{
+    const parts=body.split(/[\/|,·]+/).map(x=>x.trim()).filter(Boolean);
+    if(parts.length>1) candidates.push(...parts);
+  };
+  const parenRe=/\(([^()]{2,220})\)/g;
   let m;
-  while((m=parenRe.exec(raw))!==null){
-    const body=m[1].trim();
-    if(/[\/|,·]/.test(body)) candidates.push(...body.split(/[\/|,·]+/).map(x=>x.trim()).filter(Boolean));
+  while((m=parenRe.exec(raw))!==null) pushParts(m[1]);
+  // 괄호가 없는 상품명에서도 흔한 옵션 구분자를 보조적으로 인식한다.
+  if(!candidates.length){
+    const bracketRe=/\[([^\[\]]{2,220})\]/g;
+    while((m=bracketRe.exec(raw))!==null) pushParts(m[1]);
   }
   const dedup=[...new Set(candidates)];
   return dedup.length===count?dedup:[];
+}
+function optionTag(q,handled){
+  const n=Number(q);
+  if(handled===true) return Number.isFinite(n)&&n>0?`<span class="tag stock-ok">🟢 취급 / 재고 ${n}개</span>`:Number.isFinite(n)?`<span class="tag stock-zero">🔴 취급 / 품절</span>`:`<span class="tag stock-unknown">🟡 취급 / 재고 확인 필요</span>`;
+  if(handled===false) return Number.isFinite(n)&&n>0?`<span class="tag stock-unknown">🟡 미취급 / 재고 ${n}개</span>`:Number.isFinite(n)?`<span class="tag stock-zero">⚪ 미취급 / 품절</span>`:`<span class="tag stock-unknown">🟡 미취급 / 재고 확인 필요</span>`;
+  return Number.isFinite(n)?`<span class="tag stock-unknown">⚪ 취급 여부 미확인 / 재고 ${n}개</span>`:`<span class="tag stock-unknown">🟡 취급 여부·재고 확인 필요</span>`;
+}
+function renderOptionRows(out,options,p,nameMap=new Map(),inferred=[]){
+  out.innerHTML=`<div class="option-list">${options.map((o,i)=>{
+    const barcode=String(o.barcode||'');
+    const name=String(o.optionName||'').trim()||nameMap.get(barcode)||inferred[i]||'';
+    const source=inferred[i]&&!o.optionName&&!nameMap.get(barcode)?'상품명에 표시된 옵션명':'';
+    return `<div class="option-row"><div class="option-name" data-option-index="${i}">${name?`🎨 ${esc(name)}`:`🎨 옵션 ${i+1}`}</div><div class="tags" style="margin-top:5px">${optionTag(o.quantity,o.storeHandling)}</div>${barcode?`<div class="option-meta">식별 바코드 ${esc(barcode)}</div>`:''}${source?`<div class="option-meta">※ ${source}</div>`:''}${!name?`<div class="option-meta option-name-note" style="margin-top:5px">※ 옵션명 확인 중…</div>`:''}</div>`;
+  }).join('')}</div>`;
 }
 async function checkOptionStocks(id){
   const p=DB.products.find(x=>String(x.goodsNumber)===String(id));
@@ -224,31 +244,34 @@ async function checkOptionStocks(id){
   if(!p||!out)return;
   const codes=Array.isArray(p.barcodes_all)?p.barcodes_all.map(String).filter(Boolean):[];
   if(!codes.length){out.innerHTML='<div class="notice" style="margin-top:8px">옵션 식별 정보가 없습니다.</div>';return}
-  out.innerHTML='<div class="notice" style="margin-top:8px">옵션별 실시간 재고와 옵션명을 확인하는 중…</div>';
+  const inferred=inferOptionNames(p,codes.length);
+  out.innerHTML='<div class="notice" style="margin-top:8px">⚡ 옵션별 재고를 빠르게 확인하는 중…</div>';
   try{
     const base=String(window.OY_CONFIG?.STOCK_PROXY_URL||'').replace(/\/api\/stock\/?$/,'');
     if(!base)throw new Error('STOCK_PROXY_URL 없음');
     const qs='goodsNumber='+encodeURIComponent(id)+'&barcodes='+encodeURIComponent(codes.join(','));
-    const [stockRes,nameRes]=await Promise.all([
-      fetch(base+'/api/option-stock?'+qs,{cache:'no-store'}),
-      fetch(base+'/api/option-names?'+qs,{cache:'no-store'}).catch(()=>null)
-    ]);
-    const j=await stockRes.json();
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),5000);
+    let stockRes;
+    try{
+      stockRes=await fetch(base+'/api/option-stock?'+qs,{cache:'no-store',signal:controller.signal});
+    }finally{clearTimeout(timer)}
+    const j=await stockRes.json().catch(()=>({}));
     if(!stockRes.ok||!j.ok)throw new Error(j.message||'옵션 재고 조회 실패');
-    const names=nameRes&&nameRes.ok?await nameRes.json().catch(()=>({})):{};
-    const nameMap=new Map(Object.entries(names.optionNameByBarcode||{}).map(([k,v])=>[String(k),String(v||'').trim()]));
-    const inferred=inferOptionNames(p,codes.length);
-    out.innerHTML=`<div class="option-list">${j.options.map((o,i)=>{
-      const q=Number(o.quantity),handled=o.storeHandling;
-      let tag='';
-      if(handled===true) tag=Number.isFinite(q)&&q>0?`<span class="tag stock-ok">🟢 취급 / 재고 ${q}개</span>`:Number.isFinite(q)?`<span class="tag stock-zero">🔴 취급 / 품절</span>`:`<span class="tag stock-unknown">🟡 취급 / 재고 확인 필요</span>`;
-      else if(handled===false) tag=Number.isFinite(q)&&q>0?`<span class="tag stock-unknown">🟡 미취급 / 재고 ${q}개</span>`:Number.isFinite(q)?`<span class="tag stock-zero">⚪ 미취급 / 품절</span>`:`<span class="tag stock-unknown">🟡 미취급 / 재고 확인 필요</span>`;
-      else tag=Number.isFinite(q)?`<span class="tag stock-unknown">⚪ 취급 여부 미확인 / 재고 ${q}개</span>`:`<span class="tag stock-unknown">🟡 취급 여부·재고 확인 필요</span>`;
-      const name=String(o.optionName||'').trim()||nameMap.get(String(o.barcode))||inferred[i]||'';
-      const source=inferred[i]&&(!o.optionName)&&!nameMap.get(String(o.barcode))?'상품명에 표시된 옵션명':'';
-      return `<div class="option-row"><div class="option-name">${name?`🎨 ${esc(name)}`:`🎨 옵션 ${i+1}`}</div><div class="tags" style="margin-top:5px">${tag}</div>${o.barcode?`<div class="option-meta">식별 바코드 ${esc(o.barcode)}</div>`:''}${source?`<div class="option-meta">※ ${source}</div>`:''}${!name?`<div class="option-meta" style="margin-top:5px">※ 올리브영에서 이 옵션의 표시명을 확인하지 못했습니다.</div>`:''}</div>`;
-    }).join('')}</div>`;
-  }catch(e){out.innerHTML=`<div class="notice" style="margin-top:8px">옵션별 재고 조회에 실패했습니다.<br><span class="note">${esc(e.message||'서버 응답 오류')}</span></div>`}
+    const options=Array.isArray(j.options)?j.options:[];
+    renderOptionRows(out,options,p,new Map(),inferred);
+
+    // 옵션 재고를 먼저 보여준 뒤, 이름은 별도로 보강한다.
+    if(options.some((o,i)=>!String(o.optionName||'').trim()&&!inferred[i])){
+      fetch(base+'/api/option-names?'+qs,{cache:'no-store'}).then(async r=>r.ok?r.json():null).then(names=>{
+        if(!names)return;
+        const nameMap=new Map(Object.entries(names.optionNameByBarcode||{}).map(([k,v])=>[String(k),String(v||'').trim()]));
+        if(nameMap.size)renderOptionRows(out,options,p,nameMap,inferred);
+      }).catch(()=>{});
+    }
+  }catch(e){
+    out.innerHTML=`<div class="notice" style="margin-top:8px">옵션별 재고 조회에 실패했습니다.<br><span class="note">${esc(e.name==='AbortError'?'5초 안에 응답하지 않았습니다. 다시 시도해주세요.':(e.message||'서버 응답 오류'))}</span></div>`;
+  }
 }
 function selectSubTarget(id){const p=DB.products.find(x=>x.goodsNumber===id);if(!p)return;$('subResults').innerHTML='';$('subTarget').innerHTML=`<div class="section-title">선택한 상품</div><div class="card"><b>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</b><div class="tags" style="margin-top:7px">${stockTag(p)}<span class="tag">${esc(p.standard_category||p.sub_category||'')}</span></div><div style="margin-top:9px"><button class="btn small" onclick="checkLiveStock('${esc(id)}','subLive')">⚡ 이 상품 재고 다시 확인</button><div id="subLive" class="live-status"></div></div></div>`;renderSubstitutes(p)}
 function renderSubstitutes(target){const verified=target.analysis_status==='verified';const simMap=new Map(DB.product_similarities.filter(x=>x.product_id===target.goodsNumber).map(x=>[x.similar_product_id,Number(x.score||0)]));const tt=tokens(target.goodsName+' '+target.brand+' '+target.standard_category+' '+target.sub_category);let cand=DB.products.filter(p=>p.goodsNumber!==target.goodsNumber&&Number(p.current_stock)>0).map(p=>{let score=0,reason=[];if(simMap.has(p.goodsNumber)){score=simMap.get(p.goodsNumber)*100;reason.push('기존 유사도 데이터')}else{const pt=tokens(p.goodsName+' '+p.brand+' '+p.standard_category+' '+p.sub_category);score+=jaccard(tt,pt)*55;if(p.standard_category&&p.standard_category===target.standard_category){score+=25;reason.push('동일 세부 카테고리')}if(p.sub_category&&p.sub_category===target.sub_category){score+=10;reason.push('동일 하위 카테고리')}if(p.brand&&p.brand===target.brand){score+=5;reason.push('동일 브랜드')}const price=Number(target.price||0),pp=Number(p.price||0);if(price&&pp){score+=Math.max(0,10-Math.min(10,Math.abs(price-pp)/Math.max(price,1)*10));reason.push('가격대 참고')}}return{p,score,reason}}).sort((a,b)=>b.score-a.score).slice(0,5);$('subCandidates').innerHTML=`<div class="section-title">현재 매장 구매 가능한 대체 후보</div><div class="notice">재고 스냅샷상 재고가 있는 상품을 우선 노출합니다. 성분 분석이 없는 상품은 메타데이터 기반 1차 후보입니다.</div><div class="grid" style="margin-top:9px">${cand.map((x,i)=>{const p=x.p;return`<div class="rank-card"><div class="rank-num">${i+1}</div><div class="rank-body"><span class="score">유사도 ${Math.min(99,Math.round(x.score))}</span><h3>${esc(p.brand)} · ${esc(cleanName(p.goodsName))}</h3><div class="tags">${stockTag(p)}</div><div class="reason"><b>추천 이유</b><br>${esc(x.reason.join(' · ')||'상품 메타데이터 유사도')}</div><div class="talk"><b>💬 직원용 한마디</b><br>“찾으시는 제품은 없지만, 이 제품도 비슷한 목적에 사용할 수 있고 지금 매장에 재고가 있어요.”</div><button class="btn light small" style="margin-top:8px" onclick="openProduct('${esc(p.goodsNumber)}')">상품 정보 보기</button></div></div>`}).join('')||'<div class="empty">재고가 있는 대체 후보를 찾지 못했습니다.</div>'}</div>`}
