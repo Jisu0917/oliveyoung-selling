@@ -86,9 +86,20 @@ export default {
         ]);
         const globalList=listFrom(globalData);
         const storeList=listFrom(storeData);
-        const storeMap=new Map(storeList.map(x=>[String(x?.goodsNumber||''),x]));
-        const products=globalList.map(x=>{
-          const store=storeMap.get(String(x?.goodsNumber||''));
+        // product-search-v3의 매장 검색 결과는 상품/옵션 매칭이 불완전할 수 있으므로
+        // 각 상품의 goodsNumber를 product-stock-v3에 직접 재조회하여 현재 매장 상태를 확인한다.
+        const directResults=await Promise.all(globalList.map(async x=>{
+          try{
+            const data=await callUpstream(OY_STOCK_URL,{size:20,dispCatNo:'',page:1,keyword:String(x?.goodsNumber||''),sort:'01',strNo:STORE_CODE,includeSoldOut:true});
+            const list=listFrom(data);
+            return list.find(y=>sameProduct(y,String(x?.goodsNumber||''),''))||null;
+          }catch{return null}
+        }));
+        const storeMap=new Map();
+        storeList.forEach(x=>storeMap.set(String(x?.goodsNumber||''),x));
+        directResults.forEach(x=>{if(x?.goodsNumber)storeMap.set(String(x.goodsNumber),x)});
+        const products=globalList.map((x,idx)=>{
+          const store=directResults[idx]||storeMap.get(String(x?.goodsNumber||''));
           const q=store?quantityOf(store):0;
           const rawHandling=store?.salesStoreYn;
           const storeHandling=typeof rawHandling==='boolean' ? rawHandling : (store ? store?.o2oStockFlag!==false : false);
@@ -117,6 +128,24 @@ export default {
       }catch(e){
         return json({ok:false,message:e?.message||'상품 검색 실패'},502);
       }
+    }
+
+    if(url.pathname==='/api/option-stock'){
+      const goodsNumber=url.searchParams.get('goodsNumber')?.trim()||'';
+      const barcodes=String(url.searchParams.get('barcodes')||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,30);
+      if(!goodsNumber||!barcodes.length) return json({ok:false,message:'goodsNumber와 barcodes가 필요합니다.'},400);
+      try{
+        const options=await Promise.all(barcodes.map(async barcode=>{
+          try{
+            const data=await callUpstream(OY_STOCK_URL,{size:20,dispCatNo:'',page:1,keyword:barcode,sort:'01',strNo:STORE_CODE,includeSoldOut:true});
+            const list=listFrom(data);
+            const match=list.find(x=>sameProduct(x,goodsNumber,barcode))||list.find(x=>String(x?.goodsNumber||'')===goodsNumber);
+            const q=match?quantityOf(match):0;
+            return {barcode,quantity:Number.isFinite(q)?q:null,storeHandling:match?(typeof match?.salesStoreYn==='boolean'?match.salesStoreYn:match?.o2oStockFlag!==false):false,stockStatus:match?.stockStatus||(q>0?'in_stock':'out_of_stock')};
+          }catch{return {barcode,quantity:null,storeHandling:null,stockStatus:'unknown'}}
+        }));
+        return json({ok:true,goodsNumber,options,checkedAt:new Date().toISOString(),source:'oliveyoung'});
+      }catch(e){return json({ok:false,message:e?.message||'옵션 재고 조회 실패'},502)}
     }
 
     if(url.pathname!=='/api/stock') return json({ok:false,message:'Not Found'},404);
