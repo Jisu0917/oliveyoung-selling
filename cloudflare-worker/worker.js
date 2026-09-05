@@ -36,21 +36,81 @@ function listFrom(json){
   return [];
 }
 
+function normText(v){return String(v??'').toLowerCase().normalize('NFKC').replace(/\s+/g,' ').trim();}
+
 function sameProduct(x, goodsNumber, barcode){
   const ids=[x?.goodsNumber,x?.masterGoodsNumber,x?.masterItemNumber].map(v=>String(v??''));
-  if(ids.includes(String(goodsNumber))) return true;
-  const items=String(x?.itemNumbers??'').split(/[|,\s]+/).map(v=>v.trim()).filter(Boolean);
-  if(barcode && items.includes(String(barcode))) return true;
+  if(goodsNumber && ids.includes(String(goodsNumber))) return true;
+  const items=[];
+  for(const v of [x?.itemNumbers,x?.barcodes,x?.barcode,x?.itemNumber]){
+    if(Array.isArray(v)) items.push(...v.map(String));
+    else if(v!=null) items.push(...String(v).split(/[|,\s]+/));
+  }
+  if(barcode && items.map(String).includes(String(barcode))) return true;
   return false;
 }
 
 function quantityOf(x){
-  const candidates=[x?.o2oRemainQuantity,x?.remainQuantity,x?.stockQuantity,x?.quantity];
+  // 매장별 응답에서는 remainQuantity/stockLabel 계열을 우선 사용하고,
+  // 기존 실시간 조회와 호환되도록 O2O 필드도 fallback으로 둔다.
+  const candidates=[x?.remainQuantity,x?.o2oRemainQuantity,x?.stockQuantity,x?.quantity];
   for(const v of candidates){
     const n=Number(v);
     if(Number.isFinite(n)) return n;
   }
-  return NaN;
+  const label=String(x?.stockLabel||'');
+  const m=label.match(/(\d+)\s*개/);
+  return m?Number(m[1]):NaN;
+}
+
+function handlingOf(x){
+  if(!x) return null;
+  if(typeof x.salesStoreYn==='boolean') return x.salesStoreYn;
+  const status=String(x.stockStatus||'').toLowerCase();
+  if(status==='not_sold'||status==='not-sold'||status==='not_salable') return false;
+  if(x.o2oStockFlag===false) return false;
+  if(x.o2oStockFlag===true) return true;
+  return null;
+}
+
+function optionNameOf(x){
+  const candidates=[x?.optionName,x?.optionValue,x?.optionText,x?.itemOptionName,x?.goodsOptionName,x?.itemName,x?.itemDesc,x?.colorName,x?.shadeName,x?.shade];
+  for(const v of candidates){
+    const t=String(v??'').trim();
+    if(t) return t;
+  }
+  return '';
+}
+
+function nameMatches(a,b){
+  const aa=normText(a),bb=normText(b);
+  if(!aa||!bb) return false;
+  return aa===bb || aa.includes(bb) || bb.includes(aa);
+}
+
+async function lookupStoreStock(product){
+  const goods=String(product?.goodsNumber||'');
+  const queries=[goods];
+  if(product?.masterGoodsNumber) queries.push(String(product.masterGoodsNumber));
+  if(product?.masterItemNumber) queries.push(String(product.masterItemNumber));
+  for(const code of (Array.isArray(product?.itemNumbers)?product.itemNumbers:[]).slice(0,3)) queries.push(String(code));
+  for(const keyword of queries.filter(Boolean)){
+    try{
+      const data=await callUpstream(OY_STOCK_URL,{size:20,dispCatNo:'',page:1,keyword,sort:'01',strNo:STORE_CODE,includeSoldOut:true});
+      const list=listFrom(data);
+      const match=list.find(x=>sameProduct(x,goods,keyword));
+      if(match) return match;
+    }catch{}
+  }
+  if(product?.goodsName){
+    try{
+      const data=await callUpstream(OY_SEARCH_URL,{size:20,dispCatNo:'',page:1,keyword:String(product.goodsName),sort:'01',strNo:STORE_CODE,includeSoldOut:true});
+      const list=listFrom(data);
+      const match=list.find(x=>nameMatches(x?.goodsName,product.goodsName) || sameProduct(x,goods,''));
+      if(match) return match;
+    }catch{}
+  }
+  return null;
 }
 
 async function callUpstream(url, body){
@@ -102,7 +162,7 @@ export default {
           const store=directResults[idx]||storeMap.get(String(x?.goodsNumber||''));
           const q=store?quantityOf(store):0;
           const rawHandling=store?.salesStoreYn;
-          const storeHandling=typeof rawHandling==='boolean' ? rawHandling : (store ? store?.o2oStockFlag!==false : false);
+          const storeHandling=handlingOf(store);
           const stockStatus=store?.stockStatus || (q>0?'in_stock':'out_of_stock');
           return {
             goodsNumber:x.goodsNumber,
@@ -117,7 +177,7 @@ export default {
             sub_category:x?.mainDisplayCategory?.lowerCategoryName||'',
             leaf_category:x?.mainDisplayCategory?.leafCategoryName||'',
             standard_category:x?.standardCategory?.lowerCategoryName||'',
-            current_stock:q,
+            current_stock:Number.isFinite(q)?q:null,
             store_handling:storeHandling,
             stockStatus,
             o2oStockFlag:store?.o2oStockFlag ?? null,
@@ -139,10 +199,23 @@ export default {
           try{
             const data=await callUpstream(OY_STOCK_URL,{size:20,dispCatNo:'',page:1,keyword:barcode,sort:'01',strNo:STORE_CODE,includeSoldOut:true});
             const list=listFrom(data);
-            const match=list.find(x=>sameProduct(x,goodsNumber,barcode))||list.find(x=>String(x?.goodsNumber||'')===goodsNumber);
-            const q=match?quantityOf(match):0;
-            return {barcode,quantity:Number.isFinite(q)?q:null,storeHandling:match?(typeof match?.salesStoreYn==='boolean'?match.salesStoreYn:match?.o2oStockFlag!==false):false,stockStatus:match?.stockStatus||(q>0?'in_stock':'out_of_stock')};
-          }catch{return {barcode,quantity:null,storeHandling:null,stockStatus:'unknown'}}
+            const match=list.find(x=>sameProduct(x,goodsNumber,barcode));
+            if(match){
+              const q=quantityOf(match);
+              return {barcode, optionName:optionNameOf(match), goodsName:String(match.goodsName||''), quantity:Number.isFinite(q)?q:null, storeHandling:handlingOf(match), stockStatus:String(match.stockStatus||'').toLowerCase()||((Number.isFinite(q)&&q>0)?'in_stock':'out_of_stock')};
+            }
+            // 바코드 검색 결과가 옵션 행으로 직접 내려오지 않는 경우,
+            // 같은 barcode를 itemNumbers로 가진 응답을 한 번 더 탐색한다.
+            const loose=list.find(x=>{
+              const vals=[x?.itemNumbers,x?.barcodes,x?.barcode,x?.itemNumber].flatMap(v=>Array.isArray(v)?v.map(String):String(v??'').split(/[|,\s]+/));
+              return vals.includes(String(barcode));
+            });
+            if(loose){
+              const q=quantityOf(loose);
+              return {barcode, optionName:optionNameOf(loose), goodsName:String(loose.goodsName||''), quantity:Number.isFinite(q)?q:null, storeHandling:handlingOf(loose), stockStatus:String(loose.stockStatus||'').toLowerCase()||((Number.isFinite(q)&&q>0)?'in_stock':'out_of_stock')};
+            }
+            return {barcode,optionName:'',goodsName:'',quantity:null,storeHandling:null,stockStatus:'unknown'};
+          }catch{return {barcode,optionName:'',goodsName:'',quantity:null,storeHandling:null,stockStatus:'unknown'}}
         }));
         return json({ok:true,goodsNumber,options,checkedAt:new Date().toISOString(),source:'oliveyoung'});
       }catch(e){return json({ok:false,message:e?.message||'옵션 재고 조회 실패'},502)}
@@ -178,7 +251,7 @@ export default {
           storeCode:STORE_CODE,
           quantity:Number.isFinite(quantity)?quantity:null,
           stockStatus:match?.stockStatus || (Number.isFinite(quantity)?(quantity>0?'in_stock':'out_of_stock'):'unknown'),
-          storeHandling:typeof match?.salesStoreYn==='boolean' ? match.salesStoreYn : (match ? match?.o2oStockFlag!==false : null),
+          storeHandling:handlingOf(match),
           o2oStockFlag:match?.o2oStockFlag ?? null,
           checkedAt:new Date().toISOString(),
           source:'oliveyoung',
