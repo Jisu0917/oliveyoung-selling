@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>바코드 카메라 테스트</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff5f8;color:#3b3034;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif}
+  main{max-width:520px;margin:0 auto;padding:24px 16px 40px}
+  h1{font-size:22px;margin:0 0 8px}
+  p{line-height:1.5}
+  .card{background:white;border-radius:18px;padding:16px;box-shadow:0 4px 18px #00000010;margin-top:16px}
+  video{width:100%;aspect-ratio:4/3;background:#111;border-radius:14px;object-fit:cover}
+  button{width:100%;border:0;border-radius:13px;padding:14px;margin-top:10px;font-size:16px;font-weight:700}
+  #start{background:#ff7fa5;color:white}
+  #stop{background:#eee;color:#444}
+  #status{font-size:14px;white-space:pre-wrap}
+  #result{font-size:22px;font-weight:800;word-break:break-all}
+  .hint{font-size:13px;color:#777}
+</style>
+</head>
+<body>
+<main>
+  <h1>📷 바코드 카메라 테스트</h1>
+  <p>올영 셀링 헬퍼에 넣기 전에 <b>아이폰에서 카메라가 정상적으로 계속 켜지는지</b>만 먼저 확인합니다.</p>
+
+  <div class="card">
+    <video id="video" playsinline muted autoplay></video>
+    <button id="start">카메라 시작</button>
+    <button id="stop">카메라 끄기</button>
+    <p id="status">대기 중</p>
+  </div>
+
+  <div class="card">
+    <div class="hint">인식된 바코드</div>
+    <div id="result">아직 없음</div>
+  </div>
+
+  <div class="card">
+    <p class="hint">
+      테스트 순서: ① 카메라 시작 → ② 카메라 화면이 계속 유지되는지 확인
+      → ③ 바코드를 화면에 비춤.
+    </p>
+  </div>
+</main>
+
+<script>
+let stream = null;
+let detector = null;
+let scanning = false;
+
+const video = document.getElementById('video');
+const statusEl = document.getElementById('status');
+const resultEl = document.getElementById('result');
+
+function setStatus(t){ statusEl.textContent=t; }
+
+async function startCamera(){
+  stopCamera(false);
+  resultEl.textContent='아직 없음';
+
+  try{
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      throw new Error('이 브라우저에서는 카메라 API를 사용할 수 없습니다.');
+    }
+
+    setStatus('카메라 권한을 요청하는 중…');
+
+    stream = await navigator.mediaDevices.getUserMedia({
+      video:{
+        facingMode:{ideal:'environment'},
+        width:{ideal:1280},
+        height:{ideal:720}
+      },
+      audio:false
+    });
+
+    video.srcObject = stream;
+    await video.play();
+
+    setStatus(
+      '✅ 카메라가 켜졌습니다.\n' +
+      '카메라가 계속 켜진 상태에서 바코드를 비춰보세요.'
+    );
+
+    if('BarcodeDetector' in window){
+      try{
+        const formats = await BarcodeDetector.getSupportedFormats();
+        detector = new BarcodeDetector({formats});
+        scanning = true;
+        scanLoop();
+        setStatus(
+          '✅ 카메라 + BarcodeDetector 정상 작동\n' +
+          '바코드를 화면에 비춰주세요.'
+        );
+      }catch(e){
+        detector = null;
+        setStatus(
+          '✅ 카메라는 정상 작동합니다.\n' +
+          '⚠️ 이 브라우저에서는 BarcodeDetector를 사용할 수 없습니다.'
+        );
+      }
+    }else{
+      setStatus(
+        '✅ 카메라는 정상 작동합니다.\n' +
+        '⚠️ 이 브라우저에는 BarcodeDetector가 없습니다.'
+      );
+    }
+
+  }catch(e){
+    console.error(e);
+    if(e.name==='NotAllowedError'){
+      setStatus('❌ 카메라 권한이 거부되었습니다.\n아이폰 설정에서 이 사이트의 카메라 권한을 허용해주세요.');
+    }else if(e.name==='NotFoundError'){
+      setStatus('❌ 사용 가능한 카메라를 찾지 못했습니다.');
+    }else{
+      setStatus('❌ 카메라 시작 실패\n'+(e.message||e));
+    }
+    stopCamera(false);
+  }
+}
+
+async function scanLoop(){
+  if(!scanning || !detector) return;
+
+  try{
+    const codes = await detector.detect(video);
+    if(codes && codes.length){
+      const value = codes[0].rawValue || '';
+      if(value){
+        resultEl.textContent = value;
+        setStatus('🎉 바코드 인식 성공!');
+      }
+    }
+  }catch(e){}
+
+  if(scanning) requestAnimationFrame(scanLoop);
+}
+
+function stopCamera(showStatus=true){
+  scanning=false;
+  detector=null;
+
+  if(stream){
+    stream.getTracks().forEach(track=>track.stop());
+    stream=null;
+  }
+
+  video.srcObject=null;
+
+  if(showStatus) setStatus('카메라를 껐습니다.');
+}
+
+document.getElementById('start').addEventListener('click', startCamera);
+document.getElementById('stop').addEventListener('click', ()=>stopCamera(true));
+</script>
+</body>
+</html>
