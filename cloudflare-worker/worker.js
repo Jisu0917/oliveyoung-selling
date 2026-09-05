@@ -71,8 +71,55 @@ export default {
   async fetch(request){
     const url=new URL(request.url);
     if(request.method==='OPTIONS') return new Response(null,{status:204,headers:cors});
-    if(url.pathname!=='/api/stock') return json({ok:false,message:'Not Found'},404);
     if(request.method!=='GET') return json({ok:false,message:'GET만 지원합니다.'},405);
+
+    if(url.pathname==='/api/catalog-search'){
+      const keyword=url.searchParams.get('keyword')?.trim()||'';
+      const page=Math.max(1,Number(url.searchParams.get('page')||1));
+      if(!keyword) return json({ok:false,message:'keyword가 필요합니다.'},400);
+      try{
+        const globalBody={size:20,dispCatNo:'',page,keyword,sort:'01',includeSoldOut:true};
+        const storeBody={...globalBody,strNo:STORE_CODE};
+        const [globalData,storeData]=await Promise.all([
+          callUpstream(OY_SEARCH_URL,globalBody),
+          callUpstream(OY_SEARCH_URL,storeBody)
+        ]);
+        const globalList=listFrom(globalData);
+        const storeList=listFrom(storeData);
+        const storeMap=new Map(storeList.map(x=>[String(x?.goodsNumber||''),x]));
+        const products=globalList.map(x=>{
+          const store=storeMap.get(String(x?.goodsNumber||''));
+          const q=store?quantityOf(store):0;
+          const rawHandling=store?.salesStoreYn;
+          const storeHandling=typeof rawHandling==='boolean' ? rawHandling : (store ? store?.o2oStockFlag!==false : false);
+          const stockStatus=store?.stockStatus || (q>0?'in_stock':'out_of_stock');
+          return {
+            goodsNumber:x.goodsNumber,
+            goodsName:x.goodsName,
+            brand:x.onlineBrandName||x.brand||'',
+            price:Number(x.priceToPay)||0,
+            originalPrice:Number(x.originalPrice)||0,
+            imagePath:x.imagePath||x.goodsThumbnailPath||'',
+            barcode_master:String(x.masterGoodsNumber||x.masterItemNumber||''),
+            barcodes_all:Array.isArray(x.itemNumbers)?x.itemNumbers:[],
+            main_category:x?.mainDisplayCategory?.middleCategoryName||'',
+            sub_category:x?.mainDisplayCategory?.lowerCategoryName||'',
+            leaf_category:x?.mainDisplayCategory?.leafCategoryName||'',
+            standard_category:x?.standardCategory?.lowerCategoryName||'',
+            current_stock:q,
+            store_handling:storeHandling,
+            stockStatus,
+            o2oStockFlag:store?.o2oStockFlag ?? null,
+            stock_checked_at:new Date().toISOString()
+          };
+        });
+        return json({ok:true,keyword,products,totalCount:Number(globalData?.data?.totalCount||globalData?.data?.count||products.length),source:'oliveyoung'});
+      }catch(e){
+        return json({ok:false,message:e?.message||'상품 검색 실패'},502);
+      }
+    }
+
+    if(url.pathname!=='/api/stock') return json({ok:false,message:'Not Found'},404);
 
     const goodsNumber=url.searchParams.get('goodsNumber')?.trim();
     const goodsName=url.searchParams.get('goodsName')?.trim() || '';
@@ -101,7 +148,8 @@ export default {
           goodsNumber,
           storeCode:STORE_CODE,
           quantity:Number.isFinite(quantity)?quantity:null,
-          stockStatus:Number.isFinite(quantity)?(quantity>0?'in_stock':'out_of_stock'):'unknown',
+          stockStatus:match?.stockStatus || (Number.isFinite(quantity)?(quantity>0?'in_stock':'out_of_stock'):'unknown'),
+          storeHandling:typeof match?.salesStoreYn==='boolean' ? match.salesStoreYn : (match ? match?.o2oStockFlag!==false : null),
           o2oStockFlag:match?.o2oStockFlag ?? null,
           checkedAt:new Date().toISOString(),
           source:'oliveyoung',
