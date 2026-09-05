@@ -38,16 +38,22 @@ function listFrom(json){
 
 function normText(v){return String(v??'').toLowerCase().normalize('NFKC').replace(/\s+/g,' ').trim();}
 
-function sameProduct(x, goodsNumber, barcode){
-  const ids=[x?.goodsNumber,x?.masterGoodsNumber,x?.masterItemNumber].map(v=>String(v??''));
-  if(goodsNumber && ids.includes(String(goodsNumber))) return true;
+function barcodeList(x){
   const items=[];
-  for(const v of [x?.itemNumbers,x?.barcodes,x?.barcode,x?.itemNumber]){
+  for(const v of [x?.itemNumbers,x?.barcodes,x?.barcode,x?.itemNumber,x?.masterItemNumber]){
     if(Array.isArray(v)) items.push(...v.map(String));
     else if(v!=null) items.push(...String(v).split(/[|,\s]+/));
   }
-  if(barcode && items.map(String).includes(String(barcode))) return true;
-  return false;
+  return [...new Set(items.map(v=>v.trim()).filter(Boolean))];
+}
+function exactBarcodeMatch(x, barcode){
+  if(!barcode) return false;
+  return barcodeList(x).includes(String(barcode));
+}
+function sameProduct(x, goodsNumber, barcode){
+  const ids=[x?.goodsNumber,x?.masterGoodsNumber,x?.masterItemNumber].map(v=>String(v??''));
+  if(goodsNumber && ids.includes(String(goodsNumber))) return true;
+  return !!barcode && exactBarcodeMatch(x,barcode);
 }
 
 function quantityOf(x){
@@ -66,6 +72,11 @@ function quantityOf(x){
 function handlingOf(x){
   if(!x) return null;
   if(typeof x.salesStoreYn==='boolean') return x.salesStoreYn;
+  if(typeof x.salesStoreYn==='string'){
+    const yn=x.salesStoreYn.trim().toUpperCase();
+    if(yn==='Y'||yn==='TRUE') return true;
+    if(yn==='N'||yn==='FALSE') return false;
+  }
   const status=String(x.stockStatus||'').toLowerCase();
   if(status==='not_sold'||status==='not-sold'||status==='not_salable') return false;
   if(x.o2oStockFlag===false) return false;
@@ -234,56 +245,53 @@ export default {
 
     if(url.pathname==='/api/option-stock'){
       const goodsNumber=url.searchParams.get('goodsNumber')?.trim()||'';
-      const barcodes=String(url.searchParams.get('barcodes')||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,30);
+      const barcodes=String(url.searchParams.get('barcodes')||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,12);
       if(!goodsNumber||!barcodes.length) return json({ok:false,message:'goodsNumber와 barcodes가 필요합니다.'},400);
       try{
-        // 옵션별 조회는 '바코드 검색' 하나에 의존하지 않는다.
-        // 1) 상품번호로 매장 재고 API를 조회하고
-        // 2) 상품번호/바코드로 search-v3도 보조 조회한 뒤
-        // 3) 실제 옵션 바코드와 정확히 매칭되는 행만 사용한다.
-        const base={size:50,dispCatNo:'',page:1,sort:'01',strNo:STORE_CODE,includeSoldOut:true};
-        const collected=[];
-        const pushList=(data)=>{const list=listFrom(data);for(const x of list)if(x)collected.push(x)};
-        const productQueries=[
-          [OY_STOCK_URL,{...base,keyword:goodsNumber}],
-          [OY_SEARCH_URL,{...base,keyword:goodsNumber}],
-          [OY_SEARCH_URL,{size:50,dispCatNo:'',page:1,sort:'01',includeSoldOut:true,keyword:goodsNumber}]
-        ];
-        for(const [endpoint,body] of productQueries){try{pushList(await callUpstream(endpoint,body))}catch{}}
-        // 바코드별 조회는 실패한 옵션만 보강한다. 호출 수를 제한해 매장 검색을 과도하게 만들지 않는다.
-        const results=[];
-        for(const barcode of barcodes){
-          let match=collected.find(x=>sameProduct(x,goodsNumber,barcode));
-          if(!match){
-            const barcodeQueries=[
-              [OY_STOCK_URL,{...base,keyword:barcode}],
-              [OY_SEARCH_URL,{...base,keyword:barcode}],
-              [OY_SEARCH_URL,{size:20,dispCatNo:'',page:1,sort:'01',includeSoldOut:true,keyword:barcode}]
-            ];
-            for(const [endpoint,body] of barcodeQueries){
-              try{
-                const data=await callUpstream(endpoint,body);pushList(data);
-                const list=listFrom(data);match=list.find(x=>sameProduct(x,goodsNumber,barcode));
-                if(match)break;
-              }catch{}
-            }
+        // v23: 옵션별 조회는 '상품번호 → 여러 번 순차 검색'하지 않고
+        // 각 옵션 바코드를 매장 재고 API에 병렬로 직접 조회한다.
+        // 핵심은 goodsNumber가 같다는 이유만으로 다른 옵션의 행을 재사용하지 않는 것.
+        const base={size:20,dispCatNo:'',page:1,sort:'01',strNo:STORE_CODE,includeSoldOut:true};
+        const queryOne=async(barcode)=>{
+          const attempts=[
+            [OY_STOCK_URL,{...base,keyword:barcode}],
+            [OY_SEARCH_URL,{...base,keyword:barcode}]
+          ];
+          let lastError='';
+          for(const [endpoint,body] of attempts){
+            try{
+              const data=await callUpstream(endpoint,body);
+              const list=listFrom(data);
+              const match=list.find(x=>exactBarcodeMatch(x,barcode));
+              if(!match) continue;
+              const q=quantityOf(match);
+              return {
+                barcode,
+                optionName:optionNameOf(match),
+                goodsName:String(match.goodsName||''),
+                quantity:Number.isFinite(q)?q:null,
+                storeHandling:handlingOf(match),
+                stockStatus:String(match.stockStatus||'').toLowerCase()||((Number.isFinite(q)&&q>0)?'in_stock':'out_of_stock'),
+                found:true,
+                endpoint:endpoint.endsWith('product-stock-v3')?'product-stock-v3':'product-search-v3'
+              };
+            }catch(e){ lastError=e?.message||String(e); }
           }
-          if(!match){
-            results.push({barcode,optionName:'',goodsName:'',quantity:null,storeHandling:null,stockStatus:'unknown',found:false});
-            continue;
+          return {barcode,optionName:'',goodsName:'',quantity:null,storeHandling:null,stockStatus:'unknown',found:false,error:lastError||'not_found'};
+        };
+
+        // Olive Young upstream에는 동시에 너무 많은 요청을 보내지 않도록 4개씩 병렬 처리.
+        const results=new Array(barcodes.length);
+        let cursor=0;
+        const worker=async()=>{
+          while(true){
+            const i=cursor++;
+            if(i>=barcodes.length) return;
+            results[i]=await queryOne(barcodes[i]);
           }
-          const q=quantityOf(match);
-          results.push({
-            barcode,
-            optionName:optionNameOf(match),
-            goodsName:String(match.goodsName||''),
-            quantity:Number.isFinite(q)?q:null,
-            storeHandling:handlingOf(match),
-            stockStatus:String(match.stockStatus||'').toLowerCase()||((Number.isFinite(q)&&q>0)?'in_stock':'out_of_stock'),
-            found:true
-          });
-        }
-        return json({ok:true,goodsNumber,options:results,checkedAt:new Date().toISOString(),source:'oliveyoung'});
+        };
+        await Promise.all([worker(),worker(),worker(),worker()]);
+        return json({ok:true,goodsNumber,options:results,checkedAt:new Date().toISOString(),source:'oliveyoung',mode:'barcode-parallel'});
       }catch(e){return json({ok:false,message:e?.message||'옵션 재고 조회 실패'},502)}
     }
 
