@@ -1,4 +1,4 @@
-const CACHE='oy-da22-v19';
+const CACHE='oy-da22-v20';
 const CORE=[
   './','./index.html','./manifest.webmanifest','./config.js','./db.json',
   './fonts/Mallang-Galmuri11-R.ttf',
