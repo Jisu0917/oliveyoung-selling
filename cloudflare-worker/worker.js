@@ -90,24 +90,23 @@ function nameMatches(a,b){
 
 async function lookupStoreStock(product){
   const goods=String(product?.goodsNumber||'');
-  const queries=[goods];
-  if(product?.masterGoodsNumber) queries.push(String(product.masterGoodsNumber));
-  if(product?.masterItemNumber) queries.push(String(product.masterItemNumber));
-  for(const code of (Array.isArray(product?.itemNumbers)?product.itemNumbers:[]).slice(0,3)) queries.push(String(code));
-  for(const keyword of queries.filter(Boolean)){
+  const barcode=String(product?.barcode_master||'');
+  // /api/stock에서 실제로 정상 동작하는 조회 순서를 그대로 사용한다.
+  // 검색 목록에서 조회 실패를 '품절'로 간주하지 않는다.
+  const attempts=[
+    [OY_STOCK_URL,{size:20,dispCatNo:'',page:1,sort:'01',strNo:STORE_CODE,includeSoldOut:true,keyword:goods}],
+    [OY_SEARCH_URL,{size:20,dispCatNo:'',page:1,sort:'01',strNo:STORE_CODE,includeSoldOut:true,keyword:goods}],
+    ...(barcode?[[OY_STOCK_URL,{size:20,dispCatNo:'',page:1,sort:'01',strNo:STORE_CODE,includeSoldOut:true,keyword:barcode}],[OY_SEARCH_URL,{size:20,dispCatNo:'',page:1,sort:'01',strNo:STORE_CODE,includeSoldOut:true,keyword:barcode}]]:[]),
+    ...(product?.goodsName?[[OY_STOCK_URL,{size:20,dispCatNo:'',page:1,sort:'01',strNo:STORE_CODE,includeSoldOut:true,keyword:String(product.goodsName)}],[OY_SEARCH_URL,{size:20,dispCatNo:'',page:1,sort:'01',strNo:STORE_CODE,includeSoldOut:true,keyword:String(product.goodsName)}]]:[])
+  ];
+  for(const [endpoint,body] of attempts){
     try{
-      const data=await callUpstream(OY_STOCK_URL,{size:20,dispCatNo:'',page:1,keyword,sort:'01',strNo:STORE_CODE,includeSoldOut:true});
+      const data=await callUpstream(endpoint,body);
       const list=listFrom(data);
-      const match=list.find(x=>sameProduct(x,goods,keyword));
+      const match=list.find(x=>sameProduct(x,goods,barcode));
       if(match) return match;
-    }catch{}
-  }
-  if(product?.goodsName){
-    try{
-      const data=await callUpstream(OY_SEARCH_URL,{size:20,dispCatNo:'',page:1,keyword:String(product.goodsName),sort:'01',strNo:STORE_CODE,includeSoldOut:true});
-      const list=listFrom(data);
-      const match=list.find(x=>nameMatches(x?.goodsName,product.goodsName) || sameProduct(x,goods,''));
-      if(match) return match;
+      const byName=product?.goodsName?list.find(x=>nameMatches(x?.goodsName,product.goodsName)&&String(x?.goodsNumber||'')===goods):null;
+      if(byName) return byName;
     }catch{}
   }
   return null;
@@ -125,6 +124,37 @@ async function callUpstream(url, body){
   try{data=JSON.parse(text)}catch{}
   if(!r.ok) throw new Error(`올리브영 API HTTP ${r.status}`);
   return data;
+}
+
+
+function decodeHtml(s){return String(s||'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;|&#x27;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>');}
+function stripTags(s){return decodeHtml(String(s||'').replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ')).replace(/\\s+/g,' ').trim();}
+function cleanOptionText(s){return stripTags(s).replace(/\s+/g,' ').trim().replace(/^\[?선택하세요\]?$/i,'').replace(/^옵션을 선택해 주세요$/,'').trim();}
+function extractOptionNamesFromHtml(html, barcodes){
+  const text=String(html||'');
+  const byBarcode={};
+  const names=[];
+  // 1) barcode/option pairs appearing in the page source or embedded JSON.
+  for(const barcode of barcodes){
+    const b=String(barcode);const idx=text.indexOf(b);if(idx<0)continue;
+    const chunk=text.slice(Math.max(0,idx-1800),Math.min(text.length,idx+1800));
+    const patterns=[
+      /(?:optionName|optionValue|optionText|itemOptionName|goodsOptionName|colorName|shadeName)\s*["']?\s*[:=]\s*["']([^"'<>]{1,120})["']/i,
+      /(?:optionName|optionValue|optionText|itemOptionName|goodsOptionName|colorName|shadeName)[^>]*>\s*([^<]{1,120})</i,
+      /data-(?:option-name|option-value|optionname|optionvalue)=["']([^"']{1,120})["']/i
+    ];
+    for(const re of patterns){const m=chunk.match(re);if(m){const v=cleanOptionText(m[1]);if(v){byBarcode[b]=v;break}}}
+  }
+  // 2) standard HTML option/select/button labels.
+  const tagPatterns=[
+    /<option[^>]*>([^<]{1,120})<\/option>/gi,
+    /<(?:button|a|li|span)[^>]*(?:data-option-name|data-option-value|option-name|option-value)[^>]*>([\s\S]{1,180}?)<\/(?:button|a|li|span)>/gi
+  ];
+  for(const re of tagPatterns){let m;while((m=re.exec(text))!==null){const v=cleanOptionText(m[1]);if(v&&v.length<=120&&!/선택해 주세요|옵션을 선택/i.test(v)&&!names.includes(v))names.push(v);if(names.length>=100)break}if(names.length>=100)break}
+  // 3) common JSON-like arrays of option labels.
+  const keyRe=/(?:optionName|optionValue|optionText|itemOptionName|goodsOptionName|colorName|shadeName)\s*["']?\s*[:=]\s*["']([^"'<>]{1,120})["']/gi;
+  let m;while((m=keyRe.exec(text))!==null){const v=cleanOptionText(m[1]);if(v&&!names.includes(v)&&!/선택해 주세요|옵션을 선택/i.test(v))names.push(v);if(names.length>=100)break}
+  return {byBarcode,names:names.slice(0,100)};
 }
 
 export default {
@@ -148,22 +178,15 @@ export default {
         const storeList=listFrom(storeData);
         // product-search-v3의 매장 검색 결과는 상품/옵션 매칭이 불완전할 수 있으므로
         // 각 상품의 goodsNumber를 product-stock-v3에 직접 재조회하여 현재 매장 상태를 확인한다.
-        const directResults=await Promise.all(globalList.map(async x=>{
-          try{
-            const data=await callUpstream(OY_STOCK_URL,{size:20,dispCatNo:'',page:1,keyword:String(x?.goodsNumber||''),sort:'01',strNo:STORE_CODE,includeSoldOut:true});
-            const list=listFrom(data);
-            return list.find(y=>sameProduct(y,String(x?.goodsNumber||''),''))||null;
-          }catch{return null}
-        }));
+        const directResults=await Promise.all(globalList.map(x=>lookupStoreStock(x)));
         const storeMap=new Map();
         storeList.forEach(x=>storeMap.set(String(x?.goodsNumber||''),x));
         directResults.forEach(x=>{if(x?.goodsNumber)storeMap.set(String(x.goodsNumber),x)});
         const products=globalList.map((x,idx)=>{
-          const store=directResults[idx]||storeMap.get(String(x?.goodsNumber||''));
-          const q=store?quantityOf(store):0;
-          const rawHandling=store?.salesStoreYn;
+          const store=directResults[idx] || storeMap.get(String(x?.goodsNumber||''));
+          const q=store?quantityOf(store):NaN;
           const storeHandling=handlingOf(store);
-          const stockStatus=store?.stockStatus || (q>0?'in_stock':'out_of_stock');
+          const stockStatus=store?.stockStatus || 'unknown';
           return {
             goodsNumber:x.goodsNumber,
             goodsName:x.goodsName,
@@ -188,6 +211,25 @@ export default {
       }catch(e){
         return json({ok:false,message:e?.message||'상품 검색 실패'},502);
       }
+    }
+
+    if(url.pathname==='/api/option-names'){
+      const goodsNumber=url.searchParams.get('goodsNumber')?.trim()||'';
+      const barcodes=String(url.searchParams.get('barcodes')||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,30);
+      if(!goodsNumber) return json({ok:false,message:'goodsNumber가 필요합니다.'},400);
+      try{
+        const urls=[
+          `https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=${encodeURIComponent(goodsNumber)}`,
+          `https://m.oliveyoung.co.kr/m/goods/getGoodsDetail.do?goodsNo=${encodeURIComponent(goodsNumber)}`
+        ];
+        let html='';let last=0;
+        for(const u of urls){
+          try{const r=await fetch(u,{headers:{'User-Agent':upstreamHeaders()['User-Agent'],'Accept':'text/html,application/xhtml+xml'}});last=r.status;const t=await r.text();if(r.ok&&t.length>1000){html=t;break}}catch{}
+        }
+        if(!html)return json({ok:true,goodsNumber,optionNameByBarcode:{},names:[],source:'oliveyoung',httpStatus:last});
+        const extracted=extractOptionNamesFromHtml(html,barcodes);
+        return json({ok:true,goodsNumber,optionNameByBarcode:extracted.byBarcode,names:extracted.names,source:'oliveyoung'});
+      }catch(e){return json({ok:false,message:e?.message||'옵션명 조회 실패'},502)}
     }
 
     if(url.pathname==='/api/option-stock'){
